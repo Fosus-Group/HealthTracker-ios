@@ -37,6 +37,13 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		A5526DCE2CB70CC5007B3D27 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
 		A55619122C9F0A80009B6178 = {
 			isa = PBXGroup;
 			children = (
@@ -86,18 +93,11 @@
 		A55619382C9F0DF0009B6178 /* Auth */ = {
 			isa = PBXGroup;
 			children = (
+				A5526DCE2CB70CC5007B3D27 /* Model */,
 				A556193B2C9F0DFC009B6178 /* Controller */,
 				A556193A2C9F0DFB009B6178 /* VIew */,
-				A55619392C9F0DF7009B6178 /* Model */,
 			);
 			path = Auth;
-			sourceTree = "<group>";
-		};
-		A55619392C9F0DF7009B6178 /* Model */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Model;
 			sourceTree = "<group>";
 		};
 		A556193A2C9F0DFB009B6178 /* VIew */ = {
