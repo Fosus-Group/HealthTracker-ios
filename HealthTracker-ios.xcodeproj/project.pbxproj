@@ -64,10 +64,10 @@
 			isa = PBXGroup;
 			children = (
 				A556191E2C9F0A80009B6178 /* AppDelegate.swift */,
+				A55619362C9F0CB7009B6178 /* MainTabBarController.swift */,
 				A55619202C9F0A80009B6178 /* SceneDelegate.swift */,
 				A55619322C9F0BE7009B6178 /* Resources */,
 				A55619352C9F0C3D009B6178 /* Screens */,
-				A55619362C9F0CB7009B6178 /* MainTabBarController.swift */,
 			);
 			path = "HealthTracker-ios";
 			sourceTree = "<group>";
