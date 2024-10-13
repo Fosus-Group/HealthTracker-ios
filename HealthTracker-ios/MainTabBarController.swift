@@ -10,8 +10,6 @@ import UIKit
 final class MainTabBarController: UITabBarController {
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .red
-        
         
         setup()
         
@@ -21,6 +19,6 @@ final class MainTabBarController: UITabBarController {
 
 private extension MainTabBarController {
     func setup() {
-        viewControllers = [AuthController()]
+        viewControllers = []
     }
 }
