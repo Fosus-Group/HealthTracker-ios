@@ -34,7 +34,10 @@ final class AuthCodeVerifyController: AuthPageController {
     
     private var timer: Timer?
     
-    override var pageIndex: Int { 2 }
+    override func prevPage() {
+        codeView.clearCode()
+        super.prevPage()
+    }
     
     override func nextPage() {
         // send request

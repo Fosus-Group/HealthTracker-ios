@@ -24,14 +24,17 @@ final class CodeVerifyView: UIView {
         setup()
     }
     
+    func clearCode() {
+        textField.text = ""
+        labels.forEach { $0.text = "" }
+    }
+    
     @objc private func textChange(textField: UITextField) {
         guard var text = textField.text, !text.isEmpty else {
-            labels.forEach { $0.text = "" }
+            clearCode()
             return
         }
-        labels.forEach { label in
-            label.text = ""
-        }
+        clearCode()
         text = String(text.prefix(self.count))
         textField.text = text
         for (index, ch) in text.enumerated() {

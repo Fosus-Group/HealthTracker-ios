@@ -30,8 +30,6 @@ final class AuthFirstPageController: AuthPageController {
         return lbl
     }()
     
-    override var pageIndex: Int { 0 }
-    
     override func setup() {
         view.addSubview(backgroundImage)
         view.addSubview(titleLabel)

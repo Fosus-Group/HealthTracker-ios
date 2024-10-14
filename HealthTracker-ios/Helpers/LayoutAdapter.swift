@@ -7,7 +7,12 @@
 
 import UIKit
 
-func adapt(_ constant: CGFloat, for axis: UIAxis) -> CGFloat {
+enum LayoutAxis {
+    case horizontal
+    case vertical
+}
+
+func adapt(_ constant: CGFloat, forAxis axis: LayoutAxis) -> CGFloat {
     let screenSize = UIScreen.main.bounds.size
     let ratio: CGFloat
     switch axis {
@@ -21,26 +26,26 @@ func adapt(_ constant: CGFloat, for axis: UIAxis) -> CGFloat {
 
 extension Int {
     var VAdapted: CGFloat {
-        adapt(CGFloat(self), for: .vertical)
+        adapt(CGFloat(self), forAxis: .vertical)
     }
     var HAdapted: CGFloat {
-        adapt(CGFloat(self), for: .horizontal)
+        adapt(CGFloat(self), forAxis: .horizontal)
     }
 }
 
 extension CGFloat {
     var VAdapted: CGFloat {
-        adapt(self, for: .vertical)
+        adapt(self, forAxis: .vertical)
     }
     var HAdapted: CGFloat {
-        adapt(self, for: .horizontal)
+        adapt(self, forAxis: .horizontal)
     }
 }
 
 extension CGSize {
     var adapted: CGSize {
-        let w = adapt(self.width, for: .horizontal)
-        let h = adapt(self.height, for: .vertical)
+        let w = adapt(self.width, forAxis: .horizontal)
+        let h = adapt(self.height, forAxis: .vertical)
         return CGSize(width: w, height: h)
     }
 }

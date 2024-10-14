@@ -15,8 +15,6 @@ class AuthPageController: UIViewController {
     let mainButton: MainButton
     let shapeLayer = CALayer()
     
-    var pageIndex: Int { 0 }
-    
     var buttonOrigin: CGFloat {
         self.mainButton.frame.origin.y
     }
@@ -43,7 +41,23 @@ class AuthPageController: UIViewController {
     }
     
     @objc func nextPage() {
+        guard mainButton.isEnabled else { return }
         (parent as? AuthPageViewController)?.nextPage()
+    }
+    
+    func prevPage() {
+        (parent as? AuthPageViewController)?.prevPage()
+    }
+    
+    @objc func swipe(sender: UISwipeGestureRecognizer) {
+        switch sender.direction {
+        case .right:
+            prevPage()
+        case .left:
+            nextPage()
+        default:
+            return
+        }
     }
     
     // MARK: - UI setup
@@ -51,9 +65,19 @@ class AuthPageController: UIViewController {
     func setup() {
         view.addSubview(mainButton)
         view.layer.insertSublayer(shapeLayer, at: 0)
+        addSwipeGestures()
         setupShapeLayer()
         setupMainButton()
         makeConstraints()
+    }
+    
+    func addSwipeGestures() {
+        let swipeLeft = UISwipeGestureRecognizer(target: self, action: #selector(swipe(sender:)))
+        let swipeRight = UISwipeGestureRecognizer(target: self, action: #selector(swipe(sender:)))
+        swipeLeft.direction = .left
+        swipeRight.direction = .right
+        self.view.addGestureRecognizer(swipeLeft)
+        self.view.addGestureRecognizer(swipeRight)
     }
     
     func setupMainButton() {

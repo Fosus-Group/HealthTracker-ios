@@ -43,7 +43,7 @@ final class AuthController: UIViewController {
         return pageController.pageControllers[0].buttonOrigin
     }
     
-    private func updateProgressBarFrame() {
+    func updateProgressBarFrame() {
         progressBar.layer.cornerRadius = progressBar.bounds.height / 2
         if let buttonOrigin {
             progressBar.center.y = buttonOrigin - CSp.large.VAdapted

@@ -21,7 +21,8 @@ final class AuthPageViewController: UIPageViewController {
     
     var currentIndex: Int {
         guard !pages.isEmpty else { return 0 }
-        return pageControllers[0].pageIndex
+//        return pageControllers[0].pageIndex
+        return pages.firstIndex(of: pageControllers[0])!
     }
     
     var pageControllers: [AuthPageController] {
@@ -61,16 +62,16 @@ final class AuthPageViewController: UIPageViewController {
         onPageChange(currentIndex)
     }
     
-    @objc func swipe(sender: UISwipeGestureRecognizer) {
-        switch sender.direction {
-        case .right:
-            prevPage()
-        case .left:
-            nextPage()
-        default:
-            return
-        }
-    }
+//    @objc func swipe(sender: UISwipeGestureRecognizer) {
+//        switch sender.direction {
+//        case .right:
+//            prevPage()
+//        case .left:
+//            nextPage()
+//        default:
+//            return
+//        }
+//    }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -80,11 +81,11 @@ final class AuthPageViewController: UIPageViewController {
 private extension AuthPageViewController {
     func setup() {
         isDoubleSided = false
-        let swipeLeft = UISwipeGestureRecognizer(target: self, action: #selector(swipe(sender:)))
-        let swipeRight = UISwipeGestureRecognizer(target: self, action: #selector(swipe(sender:)))
-        swipeLeft.direction = .left
-        swipeRight.direction = .right
-        self.view.addGestureRecognizer(swipeLeft)
-        self.view.addGestureRecognizer(swipeRight)
+//        let swipeLeft = UISwipeGestureRecognizer(target: self, action: #selector(swipe(sender:)))
+//        let swipeRight = UISwipeGestureRecognizer(target: self, action: #selector(swipe(sender:)))
+//        swipeLeft.direction = .left
+//        swipeRight.direction = .right
+//        self.view.addGestureRecognizer(swipeLeft)
+//        self.view.addGestureRecognizer(swipeRight)
     }
 }

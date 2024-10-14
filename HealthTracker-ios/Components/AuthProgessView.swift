@@ -47,6 +47,7 @@ final class AuthProgessView: UIView {
         animation.toValue = finalValue
         animation.duration = 0.25
         segmentLayer.add(animation, forKey: "Reposition")
+        CATransaction.setDisableActions(false)
     }
     
     private func setup() {

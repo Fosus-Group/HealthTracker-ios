@@ -27,6 +27,7 @@
 		A55619282C9F0A81009B6178 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A55619272C9F0A81009B6178 /* Assets.xcassets */; };
 		A556192B2C9F0A81009B6178 /* Base in Resources */ = {isa = PBXBuildFile; fileRef = A556192A2C9F0A81009B6178 /* Base */; };
 		A55619372C9F0CB7009B6178 /* MainTabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A55619362C9F0CB7009B6178 /* MainTabBarController.swift */; };
+		A5C8CC4A2CBD6EE70081750A /* PhoneMask.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5C8CC492CBD6EE70081750A /* PhoneMask.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -50,6 +51,7 @@
 		A556192A2C9F0A81009B6178 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		A556192C2C9F0A81009B6178 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A55619362C9F0CB7009B6178 /* MainTabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabBarController.swift; sourceTree = "<group>"; };
+		A5C8CC492CBD6EE70081750A /* PhoneMask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneMask.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -86,7 +88,6 @@
 			isa = PBXGroup;
 			children = (
 				A5526DE22CB71992007B3D27 /* NSDirectionalEdgeInsets+UIEdgeInsets.swift */,
-				A5526E1F2CBBDBA4007B3D27 /* LayoutAdapter.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -95,6 +96,8 @@
 			isa = PBXGroup;
 			children = (
 				A5526DE42CB71992007B3D27 /* Constants.swift */,
+				A5526E1F2CBBDBA4007B3D27 /* LayoutAdapter.swift */,
+				A5C8CC492CBD6EE70081750A /* PhoneMask.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -266,6 +269,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A5C8CC4A2CBD6EE70081750A /* PhoneMask.swift in Sources */,
 				A556191F2C9F0A80009B6178 /* AppDelegate.swift in Sources */,
 				A5526DEE2CB71992007B3D27 /* Constants.swift in Sources */,
 				A5526E162CB71F97007B3D27 /* MainButton.swift in Sources */,
