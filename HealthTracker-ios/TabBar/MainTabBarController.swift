@@ -30,7 +30,7 @@ private extension MainTabBarController {
     
     func makeConstraints() {
         tabbarView.snp.makeConstraints { make in
-            make.horizontalEdges.bottom.equalTo(view.safeAreaLayoutGuide)
+            make.horizontalEdges.bottom.equalTo(view.safeAreaLayoutGuide).inset(CSp.medium.HAdapted)
             make.height.equalTo(CSp.xlarge.VAdapted)
         }
     }

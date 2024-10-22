@@ -9,5 +9,5 @@ import UIKit
 
 struct TabBarButtonModel {
     let title: String
-    let image: UIImage?
+    let imageName: String
 }
