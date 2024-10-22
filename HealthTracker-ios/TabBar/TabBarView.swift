@@ -116,10 +116,10 @@ extension TabBarView {
     
     private func setButtons() {
         [
-            TabBarButtonModel(title: "Профиль", imageName: "person"),
-            TabBarButtonModel(title: "Статистика", imageName: "chart.bar"),
-            TabBarButtonModel(title: "Календарь", imageName: "calendar"),
-            TabBarButtonModel(title: "Капля", imageName: "drop"),
+            TabBarButtonModel(title: "Профиль", image: .Icon.tabBarPerson),
+            TabBarButtonModel(title: "Статистика", image: .Icon.tabBarChart),
+            TabBarButtonModel(title: "Календарь", image: .Icon.tabBarCalendar),
+            TabBarButtonModel(title: "Капля", image: .Icon.tabBarDrop),
         ].enumerated().forEach { index, model in
             let btn = makeButton(model: model)
             btn.tag = index
@@ -134,24 +134,24 @@ extension TabBarView {
         var attributeContainer = AttributeContainer()
         attributeContainer.font = .systemFont(ofSize: 13, weight: .bold)
         var config = UIButton.Configuration.plain()
+        config.image = model.image
+        config.imageReservation = 20
+        config.preferredSymbolConfigurationForImage = .init(pointSize: 20)
         config.title = model.title
         config.imagePlacement = .leading
         config.imagePadding = CSp.min
         config.cornerStyle = .capsule
         config.background.backgroundColor = .clear
         let btn = UIButton(configuration: config)
-        let selectedImage = UIImage(systemName: model.imageName + ".fill")
-        let normalImage = UIImage(systemName: model.imageName)
+        btn.imageView?.contentMode = .scaleAspectFit
         btn.configurationUpdateHandler = { [weak self] btn in
             UIView.transition(with: btn, duration: 0.25) {
                 switch btn.state {
                 case .selected:
-                    btn.configuration?.image = selectedImage ?? normalImage
                     btn.configuration?.baseForegroundColor = .Main.green
                     btn.configuration?.title = model.title
                     btn.configuration?.attributedTitle = AttributedString(model.title, attributes: attributeContainer)
                 case .normal:
-                    btn.configuration?.image = normalImage
                     btn.configuration?.baseForegroundColor = .white
                     btn.configuration?.attributedTitle = nil
                 default:
