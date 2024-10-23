@@ -21,6 +21,10 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         self.window?.rootViewController = MainTabBarController()
         self.window?.makeKeyAndVisible()
         self.window?.backgroundColor = .white
+        
+//        DispatchQueue.main.asyncAfter(deadline: .now() + 7) { [window] in
+//            window?.rootViewController = nil
+//        }
     }
 
     func sceneDidDisconnect(_ scene: UIScene) {

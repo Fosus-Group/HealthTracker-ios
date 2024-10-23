@@ -9,15 +9,16 @@ import UIKit
 
 final class TabBarView: UIView {
     
-    var buttons: [UIButton] = []
+    private var buttons: [UIButton] = []
     
-    var movingLayer = CALayer()
+    private var selectedBackgroundLayer = CALayer()
     
-    var selectedIndex = 0
+    private var selectedIndex = 0
+    
+    private var layoutPassComplete = false
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        
         setup()
     }
     
@@ -26,7 +27,13 @@ final class TabBarView: UIView {
         layer.cornerRadius = bounds.height / 2
         
         UIView.animate(withDuration: 0.25) { [self] in
-            move(toIndex: selectedIndex)
+            calculateButtonFrames()
+        }
+        if !layoutPassComplete {
+            layoutPassComplete = true
+            DispatchQueue.main.async {
+                self.setNeedsLayout()
+            }
         }
     }
     
@@ -34,13 +41,20 @@ final class TabBarView: UIView {
         for button in buttons {
             button.isSelected = false
         }
-        sender.isSelected = true
+        UIView.transition(with: sender, duration: 10) {
+            sender.isSelected = true
+        }
         selectedIndex = sender.tag
+        layoutPassComplete = false
         setNeedsLayout()
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    deinit {
+        print("deinit TabBarView")
     }
 }
 
@@ -52,30 +66,13 @@ extension TabBarView {
         setupMovingLayer()
     }
     
-    fileprivate func setupMovingLayer() {
-        layer.insertSublayer(movingLayer, at: 0)
-        movingLayer.backgroundColor = UIColor.Main.sand.cgColor
-        movingLayer.masksToBounds = true
+    private func setupMovingLayer() {
+        layer.insertSublayer(selectedBackgroundLayer, at: 0)
+        selectedBackgroundLayer.backgroundColor = UIColor.Main.sand.cgColor
+        selectedBackgroundLayer.masksToBounds = true
     }
     
-    private func updateButton() {
-        for button in self.buttons {
-            switch button.state {
-            case .selected:
-                button.configuration?.baseForegroundColor = .Main.green
-            case .normal:
-                button.configuration?.baseForegroundColor = .white
-                button.configuration?.attributedTitle = nil
-            default:
-                break
-            }
-        }
-    }
-    
-    private func move(toIndex index: Int) {
-        let horizontalPadding = CSp.small * 2
-        let spacing = CSp.small * CGFloat(buttons.count - 1)
-        let width = bounds.width
+    private func calculateButtonFrames() {
         let selectedButton = buttons[selectedIndex]
         let selectedButtonSize = selectedButton.systemLayoutSizeFitting(
             UIView.layoutFittingCompressedSize,
@@ -83,9 +80,12 @@ extension TabBarView {
             verticalFittingPriority: .defaultLow
         )
         
+        let width = bounds.width
+        let horizontalPadding = CSp.small * 2
+        let spacing = CSp.small * CGFloat(buttons.count - 1)
         let availableWidth = width - horizontalPadding - spacing - selectedButtonSize.width
         
-        let otherButtonWidth = availableWidth / CGFloat(buttons.count - 1)
+        let otherButtonsWidth = availableWidth / CGFloat(buttons.count - 1)
         
         for index in 0..<buttons.count {
             let currentButton = buttons[index]
@@ -101,17 +101,15 @@ extension TabBarView {
             if currentButton.isSelected {
                 currentButton.bounds.size = selectedButtonSize
             } else {
-                currentButton.bounds.size = .init(
-                    width: otherButtonWidth,
+                currentButton.bounds.size = CGSize(
+                    width: otherButtonsWidth,
                     height: selectedButtonSize.height
                 )
             }
-            
         }
         
-        // MARK: - background layer
-        movingLayer.frame = selectedButton.frame
-        movingLayer.cornerRadius = movingLayer.bounds.height / 2
+        selectedBackgroundLayer.frame = selectedButton.frame
+        selectedBackgroundLayer.cornerRadius = selectedBackgroundLayer.bounds.height / 2
     }
     
     private func setButtons() {
@@ -126,8 +124,10 @@ extension TabBarView {
             btn.addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)
             buttons.append(btn)
             addSubview(btn)
+            if index == 0 {
+                btn.isSelected = true
+            }
         }
-        buttons.first?.isSelected = true
     }
     
     private func makeButton(model: TabBarButtonModel) -> UIButton {
@@ -144,24 +144,23 @@ extension TabBarView {
         config.background.backgroundColor = .clear
         let btn = UIButton(configuration: config)
         btn.imageView?.contentMode = .scaleAspectFit
-        btn.configurationUpdateHandler = { [weak self] btn in
-            UIView.transition(with: btn, duration: 0.25) {
-                switch btn.state {
-                case .selected:
-                    btn.configuration?.baseForegroundColor = .Main.green
-                    btn.configuration?.title = model.title
-                    btn.configuration?.attributedTitle = AttributedString(model.title, attributes: attributeContainer)
-                case .normal:
-                    btn.configuration?.baseForegroundColor = .white
-                    btn.configuration?.attributedTitle = nil
-                default:
-                    break
-                }
+        btn.configurationUpdateHandler = { btn in
+            switch btn.state {
+            case .selected:
+                btn.configuration?.baseForegroundColor = .Main.green
+                btn.configuration?.title = model.title
+                btn.configuration?.attributedTitle = AttributedString(
+                    model.title,
+                    attributes: attributeContainer
+                )
+            case .normal:
+                btn.configuration?.baseForegroundColor = .white
+                btn.configuration?.attributedTitle = nil
+            default:
+                break
             }
-            
-            guard let self else { return }
-            self.setNeedsLayout()
         }
+        
         return btn
     }
 }
