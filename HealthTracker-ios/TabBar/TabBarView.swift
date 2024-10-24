@@ -26,7 +26,7 @@ final class TabBarView: UIView {
         super.layoutSubviews()
         layer.cornerRadius = bounds.height / 2
         
-        UIView.animate(withDuration: 0.25) { [self] in
+        UIView.animate(withDuration: 0.25, delay: 0, options: .layoutSubviews) { [self] in
             calculateButtonFrames()
         }
         if !layoutPassComplete {
@@ -38,12 +38,8 @@ final class TabBarView: UIView {
     }
     
     @objc private func buttonTapped(_ sender: UIButton) {
-        for button in buttons {
-            button.isSelected = false
-        }
-        UIView.transition(with: sender, duration: 10) {
-            sender.isSelected = true
-        }
+        buttons[selectedIndex].isSelected = false
+        sender.isSelected = true
         selectedIndex = sender.tag
         layoutPassComplete = false
         setNeedsLayout()
@@ -113,49 +109,39 @@ extension TabBarView {
     }
     
     private func setButtons() {
-        [
-            TabBarButtonModel(title: "Профиль", image: .Icon.tabBarPerson),
-            TabBarButtonModel(title: "Статистика", image: .Icon.tabBarChart),
-            TabBarButtonModel(title: "Календарь", image: .Icon.tabBarCalendar),
-            TabBarButtonModel(title: "Капля", image: .Icon.tabBarDrop),
-        ].enumerated().forEach { index, model in
+        self.buttons = TabBarButton.allCases.map { button in
+            let model = TabBarButtonModel(title: button.title, image: button.icon)
             let btn = makeButton(model: model)
-            btn.tag = index
-            btn.addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)
-            buttons.append(btn)
+            btn.tag = button.rawValue
+            if button.rawValue == 0 { btn.isSelected = true }
+            
             addSubview(btn)
-            if index == 0 {
-                btn.isSelected = true
-            }
+            btn.addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)
+            
+            return btn
         }
     }
     
     private func makeButton(model: TabBarButtonModel) -> UIButton {
-        var attributeContainer = AttributeContainer()
-        attributeContainer.font = .systemFont(ofSize: 13, weight: .bold)
         var config = UIButton.Configuration.plain()
         config.image = model.image
-        config.imageReservation = 20
-        config.preferredSymbolConfigurationForImage = .init(pointSize: 20)
-        config.title = model.title
         config.imagePlacement = .leading
         config.imagePadding = CSp.min
-        config.cornerStyle = .capsule
+        var attributeContainer = AttributeContainer()
+        attributeContainer.font = .systemFont(ofSize: 13, weight: .bold)
+        config.attributedTitle = AttributedString(model.title, attributes: attributeContainer)
         config.background.backgroundColor = .clear
+        
         let btn = UIButton(configuration: config)
         btn.imageView?.contentMode = .scaleAspectFit
         btn.configurationUpdateHandler = { btn in
             switch btn.state {
             case .selected:
                 btn.configuration?.baseForegroundColor = .Main.green
-                btn.configuration?.title = model.title
-                btn.configuration?.attributedTitle = AttributedString(
-                    model.title,
-                    attributes: attributeContainer
-                )
+                btn.titleLabel?.isHidden = false
             case .normal:
                 btn.configuration?.baseForegroundColor = .white
-                btn.configuration?.attributedTitle = nil
+                btn.titleLabel?.isHidden = true
             default:
                 break
             }
