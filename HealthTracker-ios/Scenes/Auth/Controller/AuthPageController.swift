@@ -35,7 +35,7 @@ class AuthPageController: UIViewController {
         super.viewDidLayoutSubviews()
         let size = CGSize(
             width: view.frame.width,
-            height: view.frame.height * Constants.shapeHeightRatio
+            height: Constants.shapeHeight
         )
         shapeLayer.frame = .init(origin: .zero, size: size)
     }
@@ -108,6 +108,6 @@ class AuthPageController: UIViewController {
 
 private extension AuthPageController {
     enum Constants {
-        static let shapeHeightRatio: CGFloat = 0.574
+        static let shapeHeight: CGFloat = 485.VAdapted
     }
 }

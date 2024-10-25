@@ -20,7 +20,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         self.window = UIWindow(windowScene: windowScene)
         self.window?.rootViewController = MainTabBarController()
         self.window?.makeKeyAndVisible()
-        self.window?.backgroundColor = .white
+        self.window?.backgroundColor = .systemBackground
         
 //        DispatchQueue.main.asyncAfter(deadline: .now() + 7) { [window] in
 //            window?.rootViewController = nil

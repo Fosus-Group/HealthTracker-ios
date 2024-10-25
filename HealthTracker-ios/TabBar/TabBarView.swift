@@ -7,13 +7,19 @@
 
 import UIKit
 
+protocol TabBarControllerProtocol: UITabBarController {
+    
+}
+
 final class TabBarView: UIView {
     
     private var buttons: [UIButton] = []
     
+    weak var tabBarController: TabBarControllerProtocol?
+    
     private var selectedBackgroundLayer = CALayer()
     
-    private var selectedIndex = 0
+    var selectedIndex = 0
     
     private var layoutPassComplete = false
     
@@ -42,6 +48,7 @@ final class TabBarView: UIView {
         sender.isSelected = true
         selectedIndex = sender.tag
         layoutPassComplete = false
+        tabBarController?.selectedIndex = selectedIndex
         setNeedsLayout()
     }
     
@@ -124,27 +131,28 @@ extension TabBarView {
     
     private func makeButton(model: TabBarButtonModel) -> UIButton {
         var config = UIButton.Configuration.plain()
+        config.background.backgroundColor = .clear
         config.image = model.image
         config.imagePlacement = .leading
         config.imagePadding = CSp.min
         var attributeContainer = AttributeContainer()
         attributeContainer.font = .systemFont(ofSize: 13, weight: .bold)
-        config.attributedTitle = AttributedString(model.title, attributes: attributeContainer)
-        config.background.backgroundColor = .clear
-        
+        let attributedTitle = AttributedString(model.title, attributes: attributeContainer)
+        config.attributedTitle = attributedTitle
         let btn = UIButton(configuration: config)
         btn.imageView?.contentMode = .scaleAspectFit
         btn.configurationUpdateHandler = { btn in
             switch btn.state {
             case .selected:
-                btn.configuration?.baseForegroundColor = .Main.green
-                btn.titleLabel?.isHidden = false
+                config.baseForegroundColor = .Main.green
+                config.attributedTitle = attributedTitle
             case .normal:
-                btn.configuration?.baseForegroundColor = .white
-                btn.titleLabel?.isHidden = true
+                config.baseForegroundColor = .white
+                config.attributedTitle = nil
             default:
                 break
             }
+            btn.configuration = config
         }
         
         return btn

@@ -18,7 +18,7 @@ func adapt(_ constant: CGFloat, forAxis axis: LayoutAxis) -> CGFloat {
     switch axis {
     case .horizontal:
         ratio = screenSize.width / Constants.baseDeviceSize.width
-    default:
+    case .vertical:
         ratio = screenSize.height / Constants.baseDeviceSize.height
     }
     return constant * ratio

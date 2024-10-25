@@ -36,4 +36,13 @@ enum TabBarButton: Int, CaseIterable {
         case .training: return .Icon.tabBarDrop
         }
     }
+    
+    var viewcontroller: UIViewController {
+        switch self {
+        case .profile: return ProfileViewController()
+        case .stats: return .init()
+        case .marathon: return .init()
+        case .training: return .init()
+        }
+    }
 }

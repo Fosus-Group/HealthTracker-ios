@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 56;
+	objectVersion = 70;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -57,6 +57,10 @@
 		A5C8CC732CC3E6F10081750A /* TabBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarView.swift; sourceTree = "<group>"; };
 		A5C8CC752CC3E7840081750A /* TabBarButtonModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarButtonModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		A5EBFAE02CCAA234007783E7 /* Profile */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Profile; sourceTree = "<group>"; };
+/* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		A55619182C9F0A80009B6178 /* Frameworks */ = {
@@ -162,6 +166,7 @@
 		A55619352C9F0C3D009B6178 /* Scenes */ = {
 			isa = PBXGroup;
 			children = (
+				A5EBFAE02CCAA234007783E7 /* Profile */,
 				A55619382C9F0DF0009B6178 /* Auth */,
 			);
 			path = Scenes;
@@ -219,6 +224,9 @@
 			buildRules = (
 			);
 			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				A5EBFAE02CCAA234007783E7 /* Profile */,
 			);
 			name = "HealthTracker-ios";
 			packageProductDependencies = (

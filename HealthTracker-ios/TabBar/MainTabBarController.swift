@@ -11,6 +11,11 @@ final class MainTabBarController: UITabBarController {
     
     let tabbarView = TabBarView()
     
+    override var selectedIndex: Int {
+        get { tabbarView.selectedIndex }
+        set { }
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setup()
@@ -20,11 +25,10 @@ final class MainTabBarController: UITabBarController {
 
 private extension MainTabBarController {
     func setup() {
-        let vc1 = UIViewController()
-        vc1.view.backgroundColor = .Main.peach
-        viewControllers = [vc1]
-        view.addSubview(tabbarView)
         tabBar.removeFromSuperview()
+        viewControllers = TabBarButton.allCases.map(\.viewcontroller)
+        view.addSubview(tabbarView)
+        tabbarView.tabBarController = self
         makeConstraints()
     }
     
@@ -34,4 +38,8 @@ private extension MainTabBarController {
             make.height.equalTo(CSp.xlarge.VAdapted)
         }
     }
+}
+
+extension MainTabBarController: TabBarControllerProtocol {
+    
 }
