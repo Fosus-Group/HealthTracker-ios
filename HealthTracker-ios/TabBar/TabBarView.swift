@@ -21,8 +21,6 @@ final class TabBarView: UIView {
     
     var selectedIndex = 0
     
-    private var layoutPassComplete = false
-    
     override init(frame: CGRect) {
         super.init(frame: frame)
         setup()
@@ -35,19 +33,12 @@ final class TabBarView: UIView {
         UIView.animate(withDuration: 0.25, delay: 0, options: .layoutSubviews) { [self] in
             calculateButtonFrames()
         }
-        if !layoutPassComplete {
-            layoutPassComplete = true
-            DispatchQueue.main.async {
-                self.setNeedsLayout()
-            }
-        }
     }
     
     @objc private func buttonTapped(_ sender: UIButton) {
         buttons[selectedIndex].isSelected = false
         sender.isSelected = true
         selectedIndex = sender.tag
-        layoutPassComplete = false
         tabBarController?.selectedIndex = selectedIndex
         setNeedsLayout()
     }
@@ -77,12 +68,7 @@ extension TabBarView {
     
     private func calculateButtonFrames() {
         let selectedButton = buttons[selectedIndex]
-        let selectedButtonSize = selectedButton.systemLayoutSizeFitting(
-            UIView.layoutFittingCompressedSize,
-            withHorizontalFittingPriority: .required,
-            verticalFittingPriority: .defaultLow
-        )
-        
+        let selectedButtonSize = selectedButton.intrinsicContentSize
         let width = bounds.width
         let horizontalPadding = CSp.small * 2
         let spacing = CSp.small * CGFloat(buttons.count - 1)
@@ -92,14 +78,6 @@ extension TabBarView {
         
         for index in 0..<buttons.count {
             let currentButton = buttons[index]
-            if index == 0 {
-                currentButton.frame.origin.x = CSp.small
-            } else {
-                let xOffset = buttons[index - 1].frame.maxX + CSp.small
-                currentButton.frame.origin.x = xOffset
-            }
-            
-            currentButton.center.y = bounds.midY
             
             if currentButton.isSelected {
                 currentButton.bounds.size = selectedButtonSize
@@ -109,6 +87,16 @@ extension TabBarView {
                     height: selectedButtonSize.height
                 )
             }
+            
+            let center: CGPoint
+            if index == 0 {
+                center = CGPoint(x: CSp.small + currentButton.bounds.midX, y: bounds.midY)
+            } else {
+                let xOffset = buttons[index - 1].frame.maxX + CSp.small + currentButton.bounds.midX
+                center = CGPoint(x: xOffset, y: bounds.midY)
+            }
+            
+            currentButton.center = center
         }
         
         selectedBackgroundLayer.frame = selectedButton.frame
