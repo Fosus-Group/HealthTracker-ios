@@ -14,12 +14,13 @@ enum LayoutAxis {
 
 func adapt(_ constant: CGFloat, forAxis axis: LayoutAxis) -> CGFloat {
     let screenSize = UIScreen.main.bounds.size
+    let baseSize = Constants.baseDeviceSize
     let ratio: CGFloat
     switch axis {
     case .horizontal:
-        ratio = screenSize.width / Constants.baseDeviceSize.width
+        ratio = screenSize.width / baseSize.width
     case .vertical:
-        ratio = screenSize.height / Constants.baseDeviceSize.height
+        ratio = screenSize.height / baseSize.height
     }
     return constant * ratio
 }

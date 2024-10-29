@@ -30,14 +30,16 @@ extension ProfileViewController {
     }
     
     private func setupShapeLayer() {
+        shapeLayer.backgroundColor = UIColor.Main.sand.cgColor
         shapeLayer.cornerRadius = Constants.shapeLayerCornerRadius
+        shapeLayer.maskedCorners = [.layerMinXMaxYCorner, .layerMaxXMaxYCorner]
         shapeLayer.masksToBounds = true
         shapeLayer.bounds.size = CGSize(
             width: UIScreen.main.bounds.width,
             height: Constants.shapeLayerHeight
         )
-        shapeLayer.position = CGPoint(x: view.bounds.midX, y: 0)
-        shapeLayer.backgroundColor = UIColor.Main.sand.cgColor
+        shapeLayer.anchorPoint = .zero
+        shapeLayer.position = .zero
     }
     
 }
@@ -45,6 +47,6 @@ extension ProfileViewController {
 private extension ProfileViewController {
     enum Constants {
         static let shapeLayerCornerRadius: CGFloat = 50
-        static let shapeLayerHeight: CGFloat = 181.VAdapted
+        static let shapeLayerHeight: CGFloat = 140.VAdapted
     }
 }
