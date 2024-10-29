@@ -123,26 +123,29 @@ extension TabBarView {
         config.image = model.image
         config.imagePlacement = .leading
         config.imagePadding = CSp.min
+        
         var attributeContainer = AttributeContainer()
         attributeContainer.font = .systemFont(ofSize: 13, weight: .bold)
         let attributedTitle = AttributedString(model.title, attributes: attributeContainer)
         config.attributedTitle = attributedTitle
+        
         let btn = UIButton(configuration: config)
+        btn.clipsToBounds = true
         btn.imageView?.contentMode = .scaleAspectFit
         btn.configurationUpdateHandler = { btn in
             switch btn.state {
             case .selected:
-                config.baseForegroundColor = .Main.green
-                config.attributedTitle = attributedTitle
+                btn.configuration?.baseForegroundColor = .Main.green
+                btn.configuration?.attributedTitle = attributedTitle
             case .normal:
-                config.baseForegroundColor = .white
-                config.attributedTitle = nil
+                btn.configuration?.baseForegroundColor = .white
+                btn.configuration?.attributedTitle = nil
             default:
                 break
             }
-            btn.configuration = config
         }
         
         return btn
     }
 }
+
