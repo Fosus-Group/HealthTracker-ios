@@ -30,10 +30,10 @@ enum TabBarButton: Int, CaseIterable {
     
     var icon: UIImage? {
         switch self {
-        case .profile: return .Icon.tabBarPerson
-        case .stats: return .Icon.tabBarChart
-        case .marathon: return .Icon.tabBarCalendar
-        case .training: return .Icon.tabBarDrop
+        case .profile: return .Icon.TabBar.person
+        case .stats: return .Icon.TabBar.chart
+        case .marathon: return .Icon.TabBar.calendar
+        case .training: return .Icon.TabBar.drop
         }
     }
     

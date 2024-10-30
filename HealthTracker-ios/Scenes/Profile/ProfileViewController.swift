@@ -21,6 +21,8 @@ final class ProfileViewController: UIViewController {
         return lbl
     }()
     
+    private let avatarView = AvatarView()
+    
     init() {
         super.init(nibName: nil, bundle: nil)
         setup()
@@ -32,6 +34,7 @@ final class ProfileViewController: UIViewController {
             width: view.bounds.width,
             height: (greetingLabel.frame.maxY + CSp.medium).VAdapted
         )
+        avatarView.center = view.center
     }
     
     
@@ -45,6 +48,7 @@ extension ProfileViewController {
     private func setup() {
         view.layer.insertSublayer(shapeLayer, at: 0)
         view.addSubview(greetingLabel)
+        view.addSubview(avatarView)
         setupShapeLayer()
         makeConstraints()
     }
@@ -63,6 +67,11 @@ extension ProfileViewController {
             make.top.equalTo(view.safeAreaLayoutGuide).inset(CSp.large.VAdapted)
             make.horizontalEdges.equalTo(view.safeAreaLayoutGuide).inset(CSp.large.HAdapted)
         }
+        
+//        avatarView.snp.makeConstraints { make in
+//            make.center.equalToSuperview()
+////            make.size.equalTo(106)
+//        }
     }
     
 }

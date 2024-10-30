@@ -27,6 +27,7 @@
 		A55619282C9F0A81009B6178 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A55619272C9F0A81009B6178 /* Assets.xcassets */; };
 		A556192B2C9F0A81009B6178 /* Base in Resources */ = {isa = PBXBuildFile; fileRef = A556192A2C9F0A81009B6178 /* Base */; };
 		A55619372C9F0CB7009B6178 /* MainTabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A55619362C9F0CB7009B6178 /* MainTabBarController.swift */; };
+		A5AA9EA62CD25FDB00E44E6B /* AvatarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5AA9EA52CD25FDB00E44E6B /* AvatarView.swift */; };
 		A5C8CC4A2CBD6EE70081750A /* PhoneMask.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5C8CC492CBD6EE70081750A /* PhoneMask.swift */; };
 		A5C8CC742CC3E6F10081750A /* TabBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5C8CC732CC3E6F10081750A /* TabBarView.swift */; };
 		A5C8CC762CC3E7840081750A /* TabBarButtonModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5C8CC752CC3E7840081750A /* TabBarButtonModel.swift */; };
@@ -53,6 +54,7 @@
 		A556192A2C9F0A81009B6178 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		A556192C2C9F0A81009B6178 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A55619362C9F0CB7009B6178 /* MainTabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabBarController.swift; sourceTree = "<group>"; };
+		A5AA9EA52CD25FDB00E44E6B /* AvatarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AvatarView.swift; sourceTree = "<group>"; };
 		A5C8CC492CBD6EE70081750A /* PhoneMask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneMask.swift; sourceTree = "<group>"; };
 		A5C8CC732CC3E6F10081750A /* TabBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarView.swift; sourceTree = "<group>"; };
 		A5C8CC752CC3E7840081750A /* TabBarButtonModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarButtonModel.swift; sourceTree = "<group>"; };
@@ -117,6 +119,7 @@
 				A5526E0D2CB71F97007B3D27 /* CodeVerifyView.swift */,
 				A5526E0F2CB71F97007B3D27 /* MainButton.swift */,
 				A5526E102CB71F97007B3D27 /* MainTextField.swift */,
+				A5AA9EA52CD25FDB00E44E6B /* AvatarView.swift */,
 			);
 			name = Components;
 			path = "HealthTracker-ios/Components";
@@ -306,6 +309,7 @@
 				A5526E132CB71F97007B3D27 /* AuthProgessView.swift in Sources */,
 				A5526DD62CB71976007B3D27 /* AuthCodeVerifyController.swift in Sources */,
 				A5526DD92CB71976007B3D27 /* AuthPhoneFieldController.swift in Sources */,
+				A5AA9EA62CD25FDB00E44E6B /* AvatarView.swift in Sources */,
 				A5526E0B2CB71F45007B3D27 /* AuthController.swift in Sources */,
 				A5526E202CBBDBA4007B3D27 /* LayoutAdapter.swift in Sources */,
 				A55619212C9F0A80009B6178 /* SceneDelegate.swift in Sources */,
