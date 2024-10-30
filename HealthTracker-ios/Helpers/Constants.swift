@@ -37,6 +37,9 @@ enum Constants {
         static let verifyPhoneTitle = "Сейчас вам поступит звонок, введите последние 4 цифры входящего номера"
         static let refreshCallText = "Получить новый код можно через"
         static let requestNewCodeText = "Запросить новый код"
+        
+        // MARK: Profile
+        static let profileGreetingText = "Привет"
     }
     
     enum Fonts {

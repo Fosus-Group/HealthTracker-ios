@@ -11,9 +11,27 @@ final class ProfileViewController: UIViewController {
     
     private let shapeLayer = CALayer()
     
+    private let greetingLabel: UILabel = {
+        let lbl = UILabel()
+        lbl.text = CSt.profileGreetingText
+        lbl.font = .boldSystemFont(ofSize: 25)
+        lbl.numberOfLines = 1
+        lbl.textColor = .Main.green
+        lbl.textAlignment = .center
+        return lbl
+    }()
+    
     init() {
         super.init(nibName: nil, bundle: nil)
         setup()
+    }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        shapeLayer.bounds.size = CGSize(
+            width: view.bounds.width,
+            height: (greetingLabel.frame.maxY + CSp.medium).VAdapted
+        )
     }
     
     
@@ -26,7 +44,9 @@ extension ProfileViewController {
     
     private func setup() {
         view.layer.insertSublayer(shapeLayer, at: 0)
+        view.addSubview(greetingLabel)
         setupShapeLayer()
+        makeConstraints()
     }
     
     private func setupShapeLayer() {
@@ -34,12 +54,15 @@ extension ProfileViewController {
         shapeLayer.cornerRadius = Constants.shapeLayerCornerRadius
         shapeLayer.maskedCorners = [.layerMinXMaxYCorner, .layerMaxXMaxYCorner]
         shapeLayer.masksToBounds = true
-        shapeLayer.bounds.size = CGSize(
-            width: UIScreen.main.bounds.width,
-            height: Constants.shapeLayerHeight
-        )
         shapeLayer.anchorPoint = .zero
         shapeLayer.position = .zero
+    }
+    
+    private func makeConstraints() {
+        greetingLabel.snp.makeConstraints { make in
+            make.top.equalTo(view.safeAreaLayoutGuide).inset(CSp.large.VAdapted)
+            make.horizontalEdges.equalTo(view.safeAreaLayoutGuide).inset(CSp.large.HAdapted)
+        }
     }
     
 }
@@ -47,6 +70,5 @@ extension ProfileViewController {
 private extension ProfileViewController {
     enum Constants {
         static let shapeLayerCornerRadius: CGFloat = 50
-        static let shapeLayerHeight: CGFloat = 140.VAdapted
     }
 }
