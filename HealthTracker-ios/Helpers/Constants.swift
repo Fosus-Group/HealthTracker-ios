@@ -40,6 +40,14 @@ enum Constants {
         
         // MARK: Profile
         static let profileGreetingText = "Привет"
+        static let editProfileButtonText = "Редактировать профиль"
+        
+        static let waterCardTitle = "ВОДА"
+        static let waterCardText = "Вода необходима для нормального функционирования организма."
+        static let followCardTitle = "СЛЕДУЙ"
+        static let followCardText = "Регулярные тренировки гораздо эффективнее, чем случайные."
+        static let bodyCardTitle = "ТЕЛО"
+        static let bodyCardText = "Если ты чувствуешь боль, не игнорируй ее. Отдыхай и восстанавливайся, когда нужно."
     }
     
     enum Fonts {
@@ -50,4 +58,20 @@ enum Constants {
     
     static let authButtonHeight: CGFloat = 58
     static let authCodeHeight: CGFloat = 56
+    
+    static let carouselWaterCard = CarouselCellModel(
+        title: Strings.waterCardTitle,
+        body: Strings.waterCardText,
+        image: .Pictures.waterCard
+    )
+    static let carouselFollowCard = CarouselCellModel(
+        title: Strings.followCardTitle,
+        body: Strings.followCardText,
+        image: .Pictures.followCard
+    )
+    static let carouselBodyCard = CarouselCellModel(
+        title: Strings.bodyCardTitle,
+        body: Strings.bodyCardText,
+        image: .Pictures.bodyCard
+    )
 }
