@@ -32,17 +32,9 @@ final class AvatarView: UIView {
         didSet { avatarImageView.image = image ?? placeholderImage }
     }
     
-    private lazy var rect1: CALayer = makeRectangleShape(size: 106, color: .Main.green, 0.5)
-    private lazy var rect2: CALayer = makeRectangleShape(size: 104, color: .Main.sand, 1)
-    
-    private lazy var circle: CALayer = {
-        let circle = CALayer()
-        circle.bounds.size = .init(width: 100, height: 100)
-        circle.backgroundColor = UIColor.white.cgColor
-        circle.cornerRadius = 50
-        circle.masksToBounds = true
-        return circle
-    }()
+    private let rect1: CALayer = makeLayer(withSize: 106, cornerRadius: 36, color: .Main.green, rotation: 0.5)
+    private let rect2: CALayer = makeLayer(withSize: 104, cornerRadius: 36, color: .Main.sand, rotation: 1)
+    private let circle: CALayer = makeLayer(withSize: 100, cornerRadius: 50, color: .white)
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -80,7 +72,7 @@ final class AvatarView: UIView {
         circle.position = rect1.position
     }
     
-    func setup() {
+    private func setup() {
         layer.insertSublayer(rect1, at: 0)
         layer.insertSublayer(rect2, above: rect1)
         
@@ -90,13 +82,16 @@ final class AvatarView: UIView {
         avatarImageView.image = placeholderImage
     }
     
-    private func makeRectangleShape(size: CGFloat, color: UIColor, _ rotation: CGFloat) -> CALayer {
-        let shapeLayer = CALayer()
-        shapeLayer.bounds.size = CGSize(width: size, height: size)
-        shapeLayer.cornerRadius = 36
-        shapeLayer.backgroundColor = color.cgColor
-        shapeLayer.setAffineTransform(.init(rotationAngle: rotation))
-        return shapeLayer
+    private static func makeLayer(withSize size: CGFloat, cornerRadius: CGFloat, color: UIColor, rotation: CGFloat? = nil) -> CALayer {
+        let layer = CALayer()
+        layer.bounds.size = CGSize(width: size, height: size)
+        layer.cornerRadius = cornerRadius
+        layer.backgroundColor = color.cgColor
+        if let rotation {
+            layer.setAffineTransform(.init(rotationAngle: rotation))
+        }
+        
+        return layer
     }
     
     required init?(coder: NSCoder) {
