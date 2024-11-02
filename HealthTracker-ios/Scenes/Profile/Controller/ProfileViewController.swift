@@ -41,6 +41,10 @@ final class ProfileViewController: UIViewController {
     
     private let carouselView = CarouselCollectionView()
     
+    private var profileModel: Result<ProfileModel, Error> {
+        UserDefaults.standard.getProfileModel()
+    }
+    
     init() {
         super.init(nibName: nil, bundle: nil)
         setup()
@@ -97,9 +101,18 @@ final class ProfileViewController: UIViewController {
     }
     
     @objc private func editProfileButtonTapped() {
-        let profileModel = ProfileModel(username: "test", firstName: "John", weight: 1, height: 1, profilePicture: avatarView.image)
-        let vc = ProfileEditorViewController(profileModel: profileModel)
-        navigationController?.pushViewController(vc, animated: true)
+        switch profileModel {
+        case .success(let success):
+            let vc = ProfileEditorViewController(profileModel: success)
+            navigationController?.pushViewController(vc, animated: true)
+        case .failure(let failure):
+            let alert = UIAlertController(title: "Error", message: failure.localizedDescription, preferredStyle: .alert)
+            let action = UIAlertAction.init(title: "OK", style: .default) { [self] action in
+                navigationController?.popViewController(animated: true)
+            }
+            alert.addAction(action)
+            present(alert, animated: true)
+        }
     }
     
     
@@ -116,8 +129,15 @@ extension ProfileViewController {
         view.addSubview(avatarView)
         view.addSubview(editProfileButton)
         view.addSubview(carouselView)
+        setupAvatarView()
         setupEditProfileButton()
         setupShapeLayer()
+    }
+    
+    private func setupAvatarView() {
+        if case .success(let model) = profileModel {
+            avatarView.image = model.profilePicture
+        }
     }
     
     private func setupEditProfileButton() {

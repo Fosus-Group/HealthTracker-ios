@@ -22,6 +22,14 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         self.window?.makeKeyAndVisible()
         self.window?.backgroundColor = .systemBackground
         
+        
+        let isFirst = UserDefaults.standard.bool(forKey: "isFirstLaunch")
+        if !isFirst {
+            let model = ProfileModel(username: "firstUser", firstName: "firstName", weight: 0, height: 0, profilePicture: nil)
+            UserDefaults.standard.saveProfileModel(model)
+            UserDefaults.standard.set(true, forKey: "isFirstLaunch")
+        }
+        
 //        DispatchQueue.main.asyncAfter(deadline: .now() + 7) { [window] in
 //            window?.rootViewController = nil
 //        }

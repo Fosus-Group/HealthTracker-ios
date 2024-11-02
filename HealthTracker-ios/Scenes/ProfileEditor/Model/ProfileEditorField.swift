@@ -42,21 +42,10 @@ enum ProfileEditorField: CaseIterable {
     
     var keyboardType: UIKeyboardType {
         switch self {
-        case .username:
+        case .username, .firstName:
             return .asciiCapable
         case .weight, .height:
             return .decimalPad
-        default:
-            return .default
-        }
-    }
-    
-    var correctionType: UITextAutocorrectionType {
-        switch self {
-        case .username:
-            return .no
-        default:
-            return .yes
         }
     }
     

@@ -11,8 +11,11 @@ final class ProfileEditorTextField: UITextField {
     
     private let bottomLine = CALayer()
     
-    override init(frame: CGRect) {
-        super.init(frame: frame)
+    let editorField: ProfileEditorField
+    
+    init(editorField: ProfileEditorField) {
+        self.editorField = editorField
+        super.init(frame: .zero)
         setup()
     }
     
@@ -25,6 +28,13 @@ final class ProfileEditorTextField: UITextField {
     private func setup() {
         font = .boldSystemFont(ofSize: 13)
         borderStyle = .none
+        
+        placeholder = editorField.placeholder
+        keyboardType = editorField.keyboardType
+        autocapitalizationType = editorField.capitalizationType
+        autocorrectionType = .no
+        returnKeyType = .done
+        
         setupBottomLine()
     }
     
@@ -37,7 +47,4 @@ final class ProfileEditorTextField: UITextField {
         fatalError("init(coder:) has not been implemented")
     }
 }
-
-
-
 

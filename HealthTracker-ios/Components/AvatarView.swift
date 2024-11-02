@@ -6,10 +6,14 @@
 //
 
 import UIKit
+import PhotosUI.PHPicker
 
 final class AvatarView: UIView {
     
     private let placeholderImage = UIImage(systemName: "camera")
+    
+    
+    var delegate: PHPickerViewControllerDelegate?
     
     private let avatarImageView: UIImageView = {
         let imageView = UIImageView()
@@ -29,7 +33,23 @@ final class AvatarView: UIView {
     }()
     
     var image: UIImage? {
-        didSet { avatarImageView.image = image ?? placeholderImage }
+        didSet {
+            if let image {
+                avatarImageView.contentMode = .scaleAspectFill
+                avatarImageView.image = image
+            } else {
+                avatarImageView.contentMode = .center
+                let config = UIImage.SymbolConfiguration.init(pointSize: C.size / 2)
+                avatarImageView.image = .init(systemName: "camera")?.withConfiguration(config)
+            }
+        }
+    }
+    
+    var isEditable: Bool = false {
+        didSet {
+            guard oldValue != isEditable else { return }
+            pencilImageView.isHidden = !isEditable
+        }
     }
     
     private let rect1: CALayer = makeLayer(
@@ -56,12 +76,13 @@ final class AvatarView: UIView {
         bounds.size = CGSize(width: C.rect1Size, height: C.rect1Size)
         avatarImageView.bounds.size = CGSize(width: C.size, height: C.size)
         
-        if image == nil {
+        if let image {
+            avatarImageView.contentMode = .scaleAspectFill
+            avatarImageView.image = image
+        } else {
             avatarImageView.contentMode = .center
             let config = UIImage.SymbolConfiguration.init(pointSize: C.size / 2)
             avatarImageView.image = .init(systemName: "camera")?.withConfiguration(config)
-        } else {
-            avatarImageView.contentMode = .scaleAspectFill
         }
         
         avatarImageView.layer.cornerRadius = avatarImageView.bounds.height / 2
@@ -85,9 +106,25 @@ final class AvatarView: UIView {
         layer.insertSublayer(rect2, above: rect1)
         
         addSubview(avatarImageView)
+        
         addSubview(pencilImageView)
+        pencilImageView.isHidden = true
         
         avatarImageView.image = placeholderImage
+        
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(didTap))
+        addGestureRecognizer(tapGesture)
+        
+    }
+    
+    @objc private func didTap() {
+        guard isEditable else { return }
+        var config = PHPickerConfiguration(photoLibrary: .shared())
+        config.filter = .images
+        config.selectionLimit = 1
+        let photoPciker = PHPickerViewController(configuration: config)
+        photoPciker.delegate = delegate
+        (delegate as? UIViewController)?.present(photoPciker, animated: true, completion: nil)
     }
     
     private static func makeLayer(withSize size: CGFloat, cornerRadius: CGFloat, color: UIColor, rotation: CGFloat? = nil) -> CALayer {

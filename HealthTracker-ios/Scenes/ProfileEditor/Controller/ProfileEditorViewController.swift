@@ -6,27 +6,34 @@
 //
 
 import UIKit
+import PhotosUI.PHPicker
 
 final class ProfileEditorViewController: UIViewController {
     
-    let profileModel: ProfileModel
+    private(set) var profileModel: ProfileModel
     
     private let avatarView = AvatarView()
     
     private let fieldStackView: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .vertical
-        stackView.spacing = CSp.small
+        stackView.spacing = CSp.medium
         stackView.distribution = .fillEqually
         stackView.alignment = .fill
+        
         return stackView
     }()
     
     private let saveButton = MainButton(title: CSt.saveText)
     
-    private let scrollView = UIScrollView()
+    private let usernameTextField = ProfileEditorTextField(editorField: .username)
+    private let firstNameTextField = ProfileEditorTextField(editorField: .firstName)
+    private let weightTextField = ProfileEditorTextField(editorField: .weight)
+    private let heightTextField = ProfileEditorTextField(editorField: .height)
     
-    private var currentTextField: UITextField?
+    var textFields: [ProfileEditorTextField] {
+        [usernameTextField, firstNameTextField, weightTextField, heightTextField]
+    }
     
     init(profileModel: ProfileModel) {
         self.profileModel = profileModel
@@ -52,8 +59,52 @@ final class ProfileEditorViewController: UIViewController {
         (tabBarController as? MainTabBarController)?.tabbarView.isHidden = false
     }
     
+    @objc private func saveProfile() {
+        guard let username = usernameTextField.text,
+              let firstName = firstNameTextField.text,
+              let weightString = weightTextField.text,
+              let heightString = heightTextField.text,
+              let weight = Double(weightString),
+              let height = Double(heightString)
+        else { return }
+              
+        let profileModel = ProfileModel(
+            username: username,
+            firstName: firstName,
+            weight: weight,
+            height: height,
+            profilePicture: avatarView.image
+        )
+        
+        let result = UserDefaults.standard.saveProfileModel(profileModel)
+        switch result {
+        case .success(_):
+            navigationController?.popViewController(animated: true)
+            return
+        case .failure(let failure):
+            let alert = UIAlertController(title: "Error", message: failure.localizedDescription, preferredStyle: .alert)
+            let action = UIAlertAction.init(title: "OK", style: .default) { [self] action in
+                navigationController?.popViewController(animated: true)
+            }
+            alert.addAction(action)
+            present(alert, animated: true)
+        }
+    }
+    
     @objc private func dismissKeyboard() {
-        currentTextField?.endEditing(false)
+        for textField in textFields {
+            textField.endEditing(false)
+        }
+    }
+    
+    var canSave: Bool {
+        for textField in textFields {
+            guard let text = textField.text, !text.isEmpty else {
+                return false
+            }
+        }
+        
+        return true
     }
     
     private func layoutViews() {
@@ -67,20 +118,26 @@ final class ProfileEditorViewController: UIViewController {
         saveButton.bounds.size = .init(width: view.bounds.width - CSp.large, height: 64)
         saveButton.center = CGPoint(
             x: view.center.x,
-            y: view.bounds.height - saveButton.bounds.midY - CSp.xlarge
+            y: safeAreaFrame.maxY - saveButton.bounds.midY - CSp.medium
         )
         
-        let fieldStackViewSize = fieldStackView.systemLayoutSizeFitting(UIView.layoutFittingCompressedSize)
-        scrollView.bounds.size.height = fieldStackViewSize.height + CSp.small
-        scrollView.bounds.size.width = view.bounds.width - CSp.large
-        
-        scrollView.center = CGPoint(
-            x: view.center.x,
-            y: avatarView.frame.maxY + scrollView.bounds.height / 2 + CSp.xlarge
-        )
-        
-        fieldStackView.bounds.size = .init(width: scrollView.bounds.width, height: fieldStackViewSize.height)
-        fieldStackView.center = CGPoint(x: scrollView.bounds.midX, y: scrollView.bounds.midY)
+//        let fieldStackViewSize = fieldStackView.systemLayoutSizeFitting(
+//            .init(
+//                width: view.bounds.width,
+//                height: saveButton.frame.minY - avatarView.frame.maxY
+//            ),
+//            withHorizontalFittingPriority: .required,
+//            verticalFittingPriority: .defaultLow
+//        )
+//        
+//        fieldStackView.bounds.size = .init(
+//            width: view.bounds.width - CSp.large,
+//            height: fieldStackViewSize.height
+//        )
+//        fieldStackView.center = CGPoint(
+//            x: view.center.x,
+//            y: avatarView.frame.maxY + fieldStackViewSize.height / 2 + CSp.xlarge
+//        )
     }
     
     required init?(coder: NSCoder) {
@@ -90,14 +147,74 @@ final class ProfileEditorViewController: UIViewController {
 
 // MARK: UITextFieldDelegate
 extension ProfileEditorViewController: UITextFieldDelegate {
+    func textFieldDidEndEditing(_ textField: UITextField) {
+        saveButton.isEnabled = canSave
+        
+        guard let editorTextField = textField as? ProfileEditorTextField else { return }
+        guard let text = textField.text else { return  }
+        
+        switch editorTextField.editorField {
+        case .weight, .height:
+            textField.text = text.replacingOccurrences(of: ",", with: ".")
+        default:
+            break
+        }
+    }
     
-    func textFieldDidBeginEditing(_ textField: UITextField) {
-        currentTextField = textField
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+        
+        // TODO: Regex
+        
+        guard let editorTextField = textField as? ProfileEditorTextField else { return false }
+        guard let text = textField.text else { return false }
+        var newString = (text as NSString).replacingCharacters(in: range, with: string)
+        
+        switch editorTextField.editorField {
+        case .username:
+            if string.contains(where: { ch in
+                !ch.isLetter && !ch.isHexDigit
+            }) {
+                return false
+            }
+        case .firstName:
+            if string.contains(where: { ch in
+                !ch.isLetter && !ch.isWhitespace
+            }) {
+                return false
+            }
+        case .weight, .height:
+            newString = newString.replacingOccurrences(of: ",", with: ".")
+            if Double(newString) == nil {
+                return newString.isEmpty
+            } else {
+                return true
+            }
+        }
+        
+        return true
     }
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.endEditing(false)
         return false
+    }
+}
+
+extension ProfileEditorViewController: PHPickerViewControllerDelegate {
+    func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
+        picker.dismiss(animated: true)
+        
+        guard let firstResult = results.first else { return }
+        
+        if firstResult.itemProvider.canLoadObject(ofClass: UIImage.self) {
+            firstResult.itemProvider.loadObject(ofClass: UIImage.self) { [avatarView] image, error in
+                DispatchQueue.main.async {
+                    if let image = image as? UIImage {
+                        avatarView.image = image
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -107,11 +224,29 @@ extension ProfileEditorViewController {
     private func setup() {
         view.addSubview(avatarView)
         view.addSubview(saveButton)
-        view.addSubview(scrollView)
         view.backgroundColor = .systemBackground
         setupGesture()
-        scrollView.addSubview(fieldStackView)
+        view.addSubview(fieldStackView)
         setupScrollView()
+        setupAvtarView()
+        setupSaveButton()
+        
+        
+        fieldStackView.snp.makeConstraints { make in
+            make.horizontalEdges.equalToSuperview().inset(CSp.medium)
+            make.top.equalTo(avatarView.snp.bottom).offset(CSp.xlarge)
+        }
+    }
+    
+    private func setupAvtarView() {
+        avatarView.isEditable = true
+        avatarView.delegate = self
+        avatarView.image = profileModel.profilePicture
+    }
+    
+    private func setupSaveButton() {
+        saveButton.isEnabled = canSave
+        saveButton.addTarget(self, action: #selector(saveProfile), for: .touchUpInside)
     }
     
     private func setupGesture() {
@@ -119,19 +254,16 @@ extension ProfileEditorViewController {
         view.addGestureRecognizer(tapGesture)
     }
     
+    
     private func setupScrollView() {
-        ProfileEditorField.allCases.forEach { field in
-            fieldStackView.addArrangedSubview(makeTitledField(field: field))
+        [usernameTextField,firstNameTextField,weightTextField,heightTextField].forEach { tf in
+            fieldStackView.addArrangedSubview(makeTitledField(textField: tf))
         }
     }
     
-    private func makeTitledField(field: ProfileEditorField) -> UIStackView {
-        let textField = ProfileEditorTextField()
-        textField.placeholder = field.placeholder
-        textField.keyboardType = field.keyboardType
-        textField.autocorrectionType = field.correctionType
-        textField.autocapitalizationType = field.capitalizationType
+    private func makeTitledField(textField: ProfileEditorTextField) -> UIStackView {
         textField.delegate = self
+        let field = textField.editorField
         switch field {
         case .username:
             textField.text = profileModel.username
@@ -146,11 +278,14 @@ extension ProfileEditorViewController {
         titleLabel.text = field.title
         titleLabel.font = .boldSystemFont(ofSize: 15)
         titleLabel.textColor = .Main.green
+        
+        
         let stackView = UIStackView(arrangedSubviews: [titleLabel, textField])
         stackView.axis = .vertical
         stackView.spacing = CSp.small
+        stackView.distribution = .equalSpacing
         stackView.alignment = .fill
-        stackView.distribution = .fill
+        
         return stackView
     }
 }
