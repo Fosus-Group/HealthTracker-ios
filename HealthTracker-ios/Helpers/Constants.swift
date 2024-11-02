@@ -28,6 +28,9 @@ enum Constants {
     }
     
     enum Strings {
+        // MARK: Common
+        static let saveText = "СОХРАНИТЬ"
+        
         // MARK: Auth
         static let onboardingTitle = "Вход/Регистрация"
         static let onboardignCaption = "Здоровье - это процесс, а не мгновенный результат"
@@ -49,7 +52,11 @@ enum Constants {
         static let bodyCardTitle = "ТЕЛО"
         static let bodyCardText = "Если ты чувствуешь боль, не игнорируй ее. Отдыхай и восстанавливайся, когда нужно."
         
-        static let saveText = "СОХРАНИТЬ"
+        // MARK: ProfileEditor
+        static let usernameTitledField: (title: String, placeholder: String) = ("Имя пользователя", "Ваше имя пользователя")
+        static let firstNameTitledField: (title: String, placeholder: String) = ("Имя", "Ваше имя")
+        static let weightTitledField: (title: String, placeholder: String) = ("Вес", "Ваш вес")
+        static let heightTitledField: (title: String, placeholder: String) = ("Рост", "Ваш рост")
     }
     
     enum Fonts {

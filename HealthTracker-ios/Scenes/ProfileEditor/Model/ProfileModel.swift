@@ -8,8 +8,8 @@
 import UIKit
 
 struct ProfileModel {
-    let name: String
-    let age: Int
+    let username: String
+    let firstName: String
     let weight: Double
     let height: Double
     let profilePicture: UIImage?

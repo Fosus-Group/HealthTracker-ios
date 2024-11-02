@@ -97,7 +97,7 @@ final class ProfileViewController: UIViewController {
     }
     
     @objc private func editProfileButtonTapped() {
-        let profileModel = ProfileModel(name: "test", age: 100, weight: 1, height: 1, profilePicture: avatarView.image)
+        let profileModel = ProfileModel(username: "test", firstName: "John", weight: 1, height: 1, profilePicture: avatarView.image)
         let vc = ProfileEditorViewController(profileModel: profileModel)
         navigationController?.pushViewController(vc, animated: true)
     }
