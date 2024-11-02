@@ -26,6 +26,7 @@ final class MainTabBarController: UITabBarController {
 private extension MainTabBarController {
     func setup() {
         tabBar.removeFromSuperview()
+        tabBar.isHidden = true
         viewControllers = TabBarButton.allCases.map(\.viewcontroller)
         view.addSubview(tabbarView)
         tabbarView.tabBarController = self

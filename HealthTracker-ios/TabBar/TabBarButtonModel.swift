@@ -39,7 +39,9 @@ enum TabBarButton: Int, CaseIterable {
     
     var viewcontroller: UIViewController {
         switch self {
-        case .profile: return ProfileViewController()
+        case .profile:
+            let nav = UINavigationController(rootViewController: ProfileViewController())
+            return nav
         case .stats: return .init()
         case .marathon: return .init()
         case .training: return .init()

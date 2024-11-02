@@ -24,7 +24,7 @@ final class AvatarView: UIView {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFit
         imageView.image = .Icon.pencil
-        imageView.bounds.size = CGSize(width: 32, height: 32)
+        imageView.bounds.size = CGSize(width: C.pencilSize, height: C.pencilSize)
         return imageView
     }()
     
@@ -32,9 +32,19 @@ final class AvatarView: UIView {
         didSet { avatarImageView.image = image ?? placeholderImage }
     }
     
-    private let rect1: CALayer = makeLayer(withSize: 106, cornerRadius: 36, color: .Main.green, rotation: 0.5)
-    private let rect2: CALayer = makeLayer(withSize: 104, cornerRadius: 36, color: .Main.sand, rotation: 1)
-    private let circle: CALayer = makeLayer(withSize: 100, cornerRadius: 50, color: .white)
+    private let rect1: CALayer = makeLayer(
+        withSize: C.rect1Size,
+        cornerRadius: C.rectCornerRadius,
+        color: .Main.green,
+        rotation: 0.5
+    )
+    private let rect2: CALayer = makeLayer(
+        withSize: C.rect2Size,
+        cornerRadius: C.rectCornerRadius,
+        color: .Main.sand,
+        rotation: 1
+    )
+    private let circle: CALayer = makeLayer(withSize: C.size, cornerRadius: C.size / 2, color: .white)
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -43,25 +53,23 @@ final class AvatarView: UIView {
     
     override func layoutSubviews() {
         super.layoutSubviews()
-        bounds.size = CGSize(width: 106, height: 106)
+        bounds.size = CGSize(width: C.rect1Size, height: C.rect1Size)
+        avatarImageView.bounds.size = CGSize(width: C.size, height: C.size)
         
         if image == nil {
-            avatarImageView.bounds.size = CGSize(width: 100, height: 100)
             avatarImageView.contentMode = .center
-            let config = UIImage.SymbolConfiguration.init(pointSize: 50)
+            let config = UIImage.SymbolConfiguration.init(pointSize: C.size / 2)
             avatarImageView.image = .init(systemName: "camera")?.withConfiguration(config)
         } else {
-            avatarImageView.bounds.size = CGSize(width: 100, height: 100)
-            avatarImageView.contentMode = .scaleAspectFit
+            avatarImageView.contentMode = .scaleAspectFill
         }
         
         avatarImageView.layer.cornerRadius = avatarImageView.bounds.height / 2
         avatarImageView.center = CGPoint(x: bounds.midX, y: bounds.midY)
         
-        let pencilSize = CGSize(width: 32, height: 32)
         pencilImageView.center = CGPoint(
-            x: bounds.maxX - pencilSize.width / 2,
-            y: bounds.maxY - pencilSize.height / 2
+            x: bounds.maxX - pencilImageView.bounds.midX,
+            y: bounds.maxY - pencilImageView.bounds.midY
         )
     }
     
@@ -96,5 +104,15 @@ final class AvatarView: UIView {
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+}
+
+private extension AvatarView {
+    enum C {
+        static let size: CGFloat = 100.HAdapted
+        static let rect1Size: CGFloat = 106.HAdapted
+        static let rect2Size: CGFloat = 104.HAdapted
+        static let rectCornerRadius: CGFloat = 36.HAdapted
+        static let pencilSize: CGFloat = 32.HAdapted
     }
 }

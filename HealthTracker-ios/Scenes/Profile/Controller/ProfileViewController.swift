@@ -48,11 +48,58 @@ final class ProfileViewController: UIViewController {
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
+        
+        let safeAreaFrame = view.safeAreaLayoutGuide.layoutFrame
+        
+        greetingLabel.sizeToFit()
+        greetingLabel.center = .init(
+            x: view.center.x,
+            y: safeAreaFrame.minY + greetingLabel.bounds.height / 2 + CSp.large
+        )
+        
+        avatarView.center = .init(
+            x: view.center.x,
+            y: greetingLabel.frame.maxY + avatarView.bounds.height / 2 + CSp.large
+        )
+        
+        editProfileButton.sizeToFit()
+        editProfileButton.center = .init(
+            x: view.center.x,
+            y: avatarView.frame.maxY + editProfileButton.bounds.height / 2 + CSp.medium
+        )
+        
         shapeLayer.bounds.size = CGSize(
             width: view.bounds.width,
-            height: (greetingLabel.frame.maxY + CSp.medium).VAdapted
+            height: greetingLabel.frame.maxY + CSp.medium
         )
-        avatarView.center = .init(x: view.center.x, y: shapeLayer.frame.maxY + CSp.medium + avatarView.bounds.height / 2)
+        
+        if let tabbarView = tabBarController?.tabbarView {
+            carouselView.bounds.size = CGSize(
+                width: view.bounds.width,
+                height: tabbarView.frame.minY - editProfileButton.frame.maxY
+            )
+        }
+        
+        carouselView.center = CGPoint(
+            x: view.center.x,
+            y: editProfileButton.frame.maxY + carouselView.bounds.height / 2
+        )
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.setNavigationBarHidden(true, animated: animated)
+    }
+
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        navigationController?.setNavigationBarHidden(false, animated: animated)
+    }
+    
+    @objc private func editProfileButtonTapped() {
+        let profileModel = ProfileModel(name: "test", age: 100, weight: 1, height: 1, profilePicture: avatarView.image)
+        let vc = ProfileEditorViewController(profileModel: profileModel)
+        navigationController?.pushViewController(vc, animated: true)
     }
     
     
@@ -69,8 +116,12 @@ extension ProfileViewController {
         view.addSubview(avatarView)
         view.addSubview(editProfileButton)
         view.addSubview(carouselView)
+        setupEditProfileButton()
         setupShapeLayer()
-        makeConstraints()
+    }
+    
+    private func setupEditProfileButton() {
+        editProfileButton.addTarget(self, action: #selector(editProfileButtonTapped), for: .touchUpInside)
     }
     
     private func setupShapeLayer() {
@@ -80,24 +131,6 @@ extension ProfileViewController {
         shapeLayer.masksToBounds = true
         shapeLayer.anchorPoint = .zero
         shapeLayer.position = .zero
-    }
-    
-    private func makeConstraints() {
-        greetingLabel.snp.makeConstraints { make in
-            make.top.equalTo(view.safeAreaLayoutGuide).inset(CSp.large.VAdapted)
-            make.horizontalEdges.equalTo(view.safeAreaLayoutGuide).inset(CSp.large.HAdapted)
-        }
-        
-        editProfileButton.snp.makeConstraints { make in
-            make.centerX.equalToSuperview()
-            make.top.equalTo(avatarView.snp.bottom).offset(CSp.medium)
-        }
-        
-        carouselView.snp.makeConstraints { make in
-            make.horizontalEdges.equalTo(view.safeAreaLayoutGuide)
-            make.top.equalTo(editProfileButton.snp.bottom).offset(CSp.large)
-            make.height.equalTo(319)
-        }
     }
     
 }

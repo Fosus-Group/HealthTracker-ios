@@ -48,6 +48,8 @@ enum Constants {
         static let followCardText = "Регулярные тренировки гораздо эффективнее, чем случайные."
         static let bodyCardTitle = "ТЕЛО"
         static let bodyCardText = "Если ты чувствуешь боль, не игнорируй ее. Отдыхай и восстанавливайся, когда нужно."
+        
+        static let saveText = "СОХРАНИТЬ"
     }
     
     enum Fonts {

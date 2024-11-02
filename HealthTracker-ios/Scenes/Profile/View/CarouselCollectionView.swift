@@ -17,8 +17,8 @@ final class CarouselCollectionView: UICollectionView {
     
     init() {
         let flowLayout = UICollectionViewFlowLayout()
-        flowLayout.itemSize = .init(width: 219, height: 319)
-        flowLayout.minimumLineSpacing = 24
+        flowLayout.itemSize = .init(width: 219.HAdapted, height: 319.VAdapted)
+        flowLayout.minimumLineSpacing = 24.HAdapted
         flowLayout.sectionInset = .init(top: 0, left: 16, bottom: 0, right: 16)
         flowLayout.scrollDirection = .horizontal
         super.init(frame: .zero, collectionViewLayout: flowLayout)
