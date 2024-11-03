@@ -82,7 +82,7 @@ final class ProfileViewController: UIViewController {
             height: greetingLabel.frame.maxY + CSp.medium
         )
         
-        if let tabbarView = tabBarController?.tabbarView {
+        if let tabbarView = tabBarController?.tabBar {
             carouselView.bounds.size = CGSize(
                 width: view.bounds.width,
                 height: tabbarView.frame.minY - editProfileButton.frame.maxY

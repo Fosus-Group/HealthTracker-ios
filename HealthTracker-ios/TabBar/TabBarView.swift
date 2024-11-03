@@ -7,9 +7,7 @@
 
 import UIKit
 
-protocol TabBarControllerProtocol: UITabBarController {
-    
-}
+protocol TabBarControllerProtocol: UITabBarController {}
 
 final class TabBarView: UIView {
     
@@ -19,16 +17,30 @@ final class TabBarView: UIView {
     
     private var selectedBackgroundLayer = CALayer()
     
-    var selectedIndex = 0
+    var selectedIndex = 0 {
+        didSet {
+            buttons[oldValue].isSelected = false
+            buttons[selectedIndex].isSelected = true
+//            sender.isSelected = true
+            selectedIndex = buttons[selectedIndex].tag
+            tabBarController?.selectedIndex = selectedIndex
+            setNeedsLayout()
+        }
+    }
     
     override init(frame: CGRect) {
         super.init(frame: frame)
         setup()
     }
     
+    private lazy var hasNotch = (self.window?.windowScene?.delegate as? SceneDelegate)?.deviceHasNotch ?? false
+    
     override func layoutSubviews() {
         super.layoutSubviews()
-        layer.cornerRadius = bounds.height / 2
+        
+        if hasNotch {
+            layer.cornerRadius = bounds.height / 2
+        }
         
         UIView.animate(withDuration: 0.25, delay: 0, options: .layoutSubviews) { [self] in
             calculateButtonFrames()
@@ -148,4 +160,3 @@ extension TabBarView {
         return btn
     }
 }
-

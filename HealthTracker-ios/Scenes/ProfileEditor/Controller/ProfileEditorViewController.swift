@@ -48,6 +48,7 @@ final class ProfileEditorViewController: UIViewController {
     init(profileModel: ProfileModel) {
         self.profileModel = profileModel
         super.init(nibName: nil, bundle: nil)
+        hidesBottomBarWhenPushed = true
     }
     
     // MARK: Lifecycle
@@ -63,12 +64,12 @@ final class ProfileEditorViewController: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        (tabBarController as? MainTabBarController)?.tabbarView.isHidden = true
+//        (tabBarController as? MainTabBarController)?.tabbarView.isHidden = true
     }
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        (tabBarController as? MainTabBarController)?.tabbarView.isHidden = false
+//        (tabBarController as? MainTabBarController)?.tabbarView.isHidden = false
     }
     
     @objc private func saveProfile() {

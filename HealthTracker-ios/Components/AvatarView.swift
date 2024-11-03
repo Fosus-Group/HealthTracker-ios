@@ -56,7 +56,7 @@ final class AvatarView: UIView {
         }
     }
     
-    private(set) var isEditable: Bool = false {
+    var isEditable: Bool = false {
         didSet {
             guard oldValue != isEditable else { return }
             pencilImageView.isHidden = !isEditable

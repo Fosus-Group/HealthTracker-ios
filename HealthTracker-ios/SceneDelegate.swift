@@ -10,6 +10,8 @@ import UIKit
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     var window: UIWindow?
+    
+    var deviceHasNotch = false
 
 
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
@@ -21,6 +23,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         self.window?.rootViewController = MainTabBarController()
         self.window?.makeKeyAndVisible()
         self.window?.backgroundColor = .systemBackground
+        
+        deviceHasNotch = window?.safeAreaInsets.bottom ?? 0 > 0
         
 //        DispatchQueue.main.asyncAfter(deadline: .now() + 7) { [window] in
 //            window?.rootViewController = nil

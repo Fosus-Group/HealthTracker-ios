@@ -9,38 +9,33 @@ import UIKit
 
 final class MainTabBarController: UITabBarController {
     
-    let tabbarView = TabBarView()
-    
-    override var selectedIndex: Int {
-        get { tabbarView.selectedIndex }
-        set { }
-    }
+//    let tabbarView = TabBarView()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         setup()
     }
+    
 }
 
 
 private extension MainTabBarController {
     func setup() {
-        tabBar.removeFromSuperview()
-        tabBar.isHidden = true
+//        tabBar.removeFromSuperview()
+//        tabBar.isHidden = true
+        setValue(CustomTabBar(frame: tabBar.frame), forKey: "tabBar")
         viewControllers = TabBarButton.allCases.map(\.viewcontroller)
-        view.addSubview(tabbarView)
-        tabbarView.tabBarController = self
+//        view.addSubview(tabbarView)
+//        tabbarView.tabBarController = self
         makeConstraints()
     }
     
     func makeConstraints() {
-        tabbarView.snp.makeConstraints { make in
-            make.horizontalEdges.bottom.equalTo(view.safeAreaLayoutGuide).inset(CSp.medium)
-            make.height.equalTo(CSp.xlarge.VAdapted)
-        }
+//        tabbarView.snp.makeConstraints { make in
+//            make.horizontalEdges.bottom.equalTo(view.safeAreaLayoutGuide).inset(CSp.medium)
+//            make.height.equalTo(CSp.xlarge.VAdapted)
+//        }
     }
 }
 
-extension MainTabBarController: TabBarControllerProtocol {
-    
-}
+extension MainTabBarController: TabBarControllerProtocol {}
