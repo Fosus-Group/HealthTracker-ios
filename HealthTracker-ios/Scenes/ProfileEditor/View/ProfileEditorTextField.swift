@@ -11,12 +11,19 @@ final class ProfileEditorTextField: UITextField {
     
     private let bottomLine = CALayer()
     
-    let editorField: ProfileEditorField
+    let fieldType: ProfileEditorField
     
-    init(editorField: ProfileEditorField) {
-        self.editorField = editorField
+    init(fieldType: ProfileEditorField) {
+        self.fieldType = fieldType
         super.init(frame: .zero)
         setup()
+    }
+    
+    
+    override var intrinsicContentSize: CGSize {
+        let size = super.intrinsicContentSize
+        
+        return CGSize(width: size.width, height: size.height + 10)
     }
     
     override func layoutSubviews() {
@@ -29,11 +36,12 @@ final class ProfileEditorTextField: UITextField {
         font = .boldSystemFont(ofSize: 13)
         borderStyle = .none
         
-        placeholder = editorField.placeholder
-        keyboardType = editorField.keyboardType
-        autocapitalizationType = editorField.capitalizationType
+        placeholder = fieldType.placeholder
+        keyboardType = fieldType.keyboardType
+        autocapitalizationType = fieldType.capitalizationType
         autocorrectionType = .no
         returnKeyType = .done
+        tag = fieldType.rawValue
         
         setupBottomLine()
     }

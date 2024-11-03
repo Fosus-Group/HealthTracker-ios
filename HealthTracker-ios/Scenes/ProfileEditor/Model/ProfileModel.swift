@@ -13,48 +13,54 @@ struct ProfileModel {
     let weight: Double
     let height: Double
     let profilePicture: UIImage?
-}
-
-extension ProfileModel: Decodable {
-    enum CodingKeys: String, CodingKey {
-        case username
-        case firstName
-        case weight
-        case height
-        case profilePicture
+    
+    
+    func saveToDisk() {
+        UserDefaults.standard.set(username, forKey: "username")
+        UserDefaults.standard.set(firstName, forKey: "firstName")
+        UserDefaults.standard.set(weight, forKey: "weight")
+        UserDefaults.standard.set(height, forKey: "height")
+        
+        
+        let filemanager = FileManager.default
+        guard let documentDirectory = filemanager.urls(for: .documentDirectory, in: .userDomainMask).first else { return }
+        let imageURL = documentDirectory.appendingPathComponent("profilePicture", conformingTo: .jpeg)
+        
+        guard let profilePicture else { return }
+        
+        let imageRenderer = UIGraphicsImageRenderer(size: .init(width: 100, height: 100))
+        let data = imageRenderer.jpegData(withCompressionQuality: 1) { context in
+            let rect = CGRect(origin: .zero, size: .init(width: 100, height: 100))
+            profilePicture.draw(in: rect)
+        }
+        
+        do {
+            try data.write(to: imageURL)
+        } catch {
+            debugPrint(error)
+        }
+        
     }
     
-    init(from decoder: any Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        self.username = try container.decode(String.self, forKey: .username)
-        self.firstName = try container.decode(String.self, forKey: .firstName)
-        self.weight = try container.decode(Double.self, forKey: .weight)
-        self.height = try container.decode(Double.self, forKey: .height)
-        
-        if let data = try container.decode(Data?.self, forKey: .profilePicture) {
-            guard let image = UIImage(data: data) else {
-                throw DecodingError.dataCorruptedError(
-                    forKey: .profilePicture,
-                    in: container,
-                    debugDescription: "Could not decode image"
-                )
-            }
-            self.profilePicture = image
-        } else {
-            self.profilePicture = nil
+    static func getFromDisk() -> ProfileModel? {
+        guard let username = UserDefaults.standard.string(forKey: "username"),
+              let firstName = UserDefaults.standard.string(forKey: "firstName")
+        else {
+            return nil
         }
-    }
-}
-
-extension ProfileModel: Encodable {
-    func encode(to encoder: any Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(username, forKey: .username)
-        try container.encode(firstName, forKey: .firstName)
-        try container.encode(weight, forKey: .weight)
-        try container.encode(height, forKey: .height)
         
-        let data = profilePicture?.jpegData(compressionQuality: 0)
-        try container.encode(data, forKey: .profilePicture)
+        let weight = UserDefaults.standard.double(forKey: "weight")
+        let height = UserDefaults.standard.double(forKey: "height")
+        
+        let filemanager = FileManager.default
+        guard let documentDirectory = filemanager.urls(for: .documentDirectory, in: .userDomainMask).first else { return nil }
+        let imageURL = documentDirectory.appendingPathComponent("profilePicture", conformingTo: .jpeg)
+        
+        var image: UIImage?
+        if filemanager.fileExists(atPath: imageURL.path) {
+            image = UIImage(contentsOfFile: imageURL.path)
+        }
+        
+        return ProfileModel(username: username, firstName: firstName, weight: weight, height: height, profilePicture: image)
     }
 }

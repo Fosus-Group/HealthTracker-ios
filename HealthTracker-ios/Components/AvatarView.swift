@@ -12,9 +12,6 @@ final class AvatarView: UIView {
     
     private let placeholderImage = UIImage(systemName: "camera")
     
-    
-    var delegate: PHPickerViewControllerDelegate?
-    
     private let avatarImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFit
@@ -32,6 +29,20 @@ final class AvatarView: UIView {
         return imageView
     }()
     
+    private lazy var photoPicker: PHPickerViewController? = {
+        guard isEditable else { return nil }
+        
+        var config = PHPickerConfiguration(photoLibrary: .shared())
+        config.filter = .images
+        config.selectionLimit = 1
+        let photoPciker = PHPickerViewController(configuration: config)
+        photoPciker.delegate = delegate
+        
+        return photoPciker
+    }()
+    
+    weak var delegate: PHPickerViewControllerDelegate?
+    
     var image: UIImage? {
         didSet {
             if let image {
@@ -45,7 +56,7 @@ final class AvatarView: UIView {
         }
     }
     
-    var isEditable: Bool = false {
+    private(set) var isEditable: Bool = false {
         didSet {
             guard oldValue != isEditable else { return }
             pencilImageView.isHidden = !isEditable
@@ -101,6 +112,11 @@ final class AvatarView: UIView {
         circle.position = rect1.position
     }
     
+    @objc private func didTap() {
+        guard let photoPicker else { return }
+        (delegate as? UIViewController)?.present(photoPicker, animated: true, completion: nil)
+    }
+    
     private func setup() {
         layer.insertSublayer(rect1, at: 0)
         layer.insertSublayer(rect2, above: rect1)
@@ -114,17 +130,6 @@ final class AvatarView: UIView {
         
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(didTap))
         addGestureRecognizer(tapGesture)
-        
-    }
-    
-    @objc private func didTap() {
-        guard isEditable else { return }
-        var config = PHPickerConfiguration(photoLibrary: .shared())
-        config.filter = .images
-        config.selectionLimit = 1
-        let photoPciker = PHPickerViewController(configuration: config)
-        photoPciker.delegate = delegate
-        (delegate as? UIViewController)?.present(photoPciker, animated: true, completion: nil)
     }
     
     private static func makeLayer(withSize size: CGFloat, cornerRadius: CGFloat, color: UIColor, rotation: CGFloat? = nil) -> CALayer {

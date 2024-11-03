@@ -7,7 +7,7 @@
 
 import UIKit
 
-enum ProfileEditorField: CaseIterable {
+enum ProfileEditorField: Int, CaseIterable {
     case username
     case firstName
     case weight

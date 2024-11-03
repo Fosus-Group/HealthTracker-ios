@@ -41,8 +41,13 @@ final class ProfileViewController: UIViewController {
     
     private let carouselView = CarouselCollectionView()
     
-    private var profileModel: Result<ProfileModel, Error> {
-        UserDefaults.standard.getProfileModel()
+    private var profileModel: ProfileModel {
+        // TODO: Network request
+        if let saved = ProfileModel.getFromDisk() {
+            return saved
+        } else {
+            return ProfileModel(username: "", firstName: "", weight: 0, height: 0, profilePicture: nil)
+        }
     }
     
     init() {
@@ -93,6 +98,7 @@ final class ProfileViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(true, animated: animated)
+        setupAvatarView()
     }
 
     override func viewWillDisappear(_ animated: Bool) {
@@ -101,18 +107,8 @@ final class ProfileViewController: UIViewController {
     }
     
     @objc private func editProfileButtonTapped() {
-        switch profileModel {
-        case .success(let success):
-            let vc = ProfileEditorViewController(profileModel: success)
-            navigationController?.pushViewController(vc, animated: true)
-        case .failure(let failure):
-            let alert = UIAlertController(title: "Error", message: failure.localizedDescription, preferredStyle: .alert)
-            let action = UIAlertAction.init(title: "OK", style: .default) { [self] action in
-                navigationController?.popViewController(animated: true)
-            }
-            alert.addAction(action)
-            present(alert, animated: true)
-        }
+        let vc = ProfileEditorViewController(profileModel: profileModel)
+        navigationController?.pushViewController(vc, animated: true)
     }
     
     
@@ -135,9 +131,7 @@ extension ProfileViewController {
     }
     
     private func setupAvatarView() {
-        if case .success(let model) = profileModel {
-            avatarView.image = model.profilePicture
-        }
+        avatarView.image = profileModel.profilePicture
     }
     
     private func setupEditProfileButton() {
