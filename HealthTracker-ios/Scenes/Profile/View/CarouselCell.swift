@@ -37,7 +37,7 @@ final class CarouselCell: UICollectionViewCell {
     
     private static func makeLabel(withSize size: CGFloat) -> UILabel {
         let label = UILabel()
-        label.font = .boldSystemFont(ofSize: size)
+        label.font = .boldSystemFont(ofSize: size).adapted
         label.textColor = .Main.green
         label.numberOfLines = 0
         return label
