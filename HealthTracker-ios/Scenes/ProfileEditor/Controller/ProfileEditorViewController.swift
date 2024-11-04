@@ -62,16 +62,6 @@ final class ProfileEditorViewController: UIViewController {
         layoutFrames()
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-//        (tabBarController as? MainTabBarController)?.tabbarView.isHidden = true
-    }
-    
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-//        (tabBarController as? MainTabBarController)?.tabbarView.isHidden = false
-    }
-    
     @objc private func saveProfile() {
         guard let username = usernameTextField.text,
               let firstName = firstNameTextField.text,

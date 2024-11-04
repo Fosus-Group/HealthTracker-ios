@@ -7,8 +7,6 @@
 
 import UIKit
 
-protocol TabBarControllerProtocol: UITabBarController {}
-
 final class TabBarView: UIView {
     
     private var buttons: [UIButton] = []
@@ -17,16 +15,7 @@ final class TabBarView: UIView {
     
     private var selectedBackgroundLayer = CALayer()
     
-    var selectedIndex = 0 {
-        didSet {
-            buttons[oldValue].isSelected = false
-            buttons[selectedIndex].isSelected = true
-//            sender.isSelected = true
-            selectedIndex = buttons[selectedIndex].tag
-            tabBarController?.selectedIndex = selectedIndex
-            setNeedsLayout()
-        }
-    }
+    private(set) var selectedIndex = 0
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -51,7 +40,7 @@ final class TabBarView: UIView {
         buttons[selectedIndex].isSelected = false
         sender.isSelected = true
         selectedIndex = sender.tag
-        tabBarController?.selectedIndex = selectedIndex
+        tabBarController?.didTapTabBarButton(selectedIndex)
         setNeedsLayout()
     }
     

@@ -11,10 +11,6 @@ final class ProfileViewController: UIViewController {
     
     private let shapeLayer = CALayer()
     
-    override var tabBarController: MainTabBarController? {
-        super.tabBarController as? MainTabBarController
-    }
-    
     private let greetingLabel: UILabel = {
         let lbl = UILabel()
         lbl.text = CSt.profileGreetingText
