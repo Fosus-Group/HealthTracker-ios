@@ -10,9 +10,21 @@ import UIKit
 
 final class MainTextField: UITextField {
     
+    private let codeLabel = UILabel()
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         setup()
+    }
+    
+    var code: String {
+        "+7"
+    }
+    
+    var phoneNumber: String? {
+        guard let text else { return nil }
+        let digits = text.replacingOccurrences(of: "[^0-9]", with: "", options: .regularExpression)
+        return "\(code)\(digits)"
     }
     
     override func textRect(forBounds bounds: CGRect) -> CGRect {
@@ -44,12 +56,11 @@ final class MainTextField: UITextField {
         backgroundColor = UIColor.white
         layer.cornerRadius = CSp.medium
         
-        let leftView = UILabel()
-        leftView.text = "+7"
-        leftView.textColor = .Main.green
-        leftView.font = CFs.text.adapted
+        codeLabel.text = code
+        codeLabel.textColor = .Main.green
+        codeLabel.font = CFs.text.adapted
         self.leftViewMode = .always
-        self.leftView = leftView
+        self.leftView = codeLabel
     }
     
     

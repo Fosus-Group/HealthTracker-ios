@@ -14,6 +14,7 @@ class AuthPageController: UIViewController {
     
     let mainButton: MainButton
     let shapeLayer = CALayer()
+    let authService: AuthServiceProtocol = AuthService()
     
     var buttonOrigin: CGFloat {
         self.mainButton.frame.origin.y
@@ -40,7 +41,7 @@ class AuthPageController: UIViewController {
         shapeLayer.frame = .init(origin: .zero, size: size)
     }
     
-    @objc func nextPage() {
+    func nextPage() {
         guard mainButton.isEnabled else { return }
         (parent as? AuthPageViewController)?.nextPage()
     }
@@ -51,13 +52,17 @@ class AuthPageController: UIViewController {
     
     @objc func swipe(sender: UISwipeGestureRecognizer) {
         switch sender.direction {
-        case .right:
-            prevPage()
         case .left:
             nextPage()
+        case .right:
+            prevPage()
         default:
             return
         }
+    }
+    
+    @objc func mainButtonTapped() {
+        nextPage()
     }
     
     // MARK: - UI setup
@@ -81,7 +86,7 @@ class AuthPageController: UIViewController {
     }
     
     func setupMainButton() {
-        mainButton.addTarget(self, action: #selector(nextPage), for: .touchUpInside)
+        mainButton.addTarget(self, action: #selector(mainButtonTapped), for: .touchUpInside)
     }
     
     func setupShapeLayer() {

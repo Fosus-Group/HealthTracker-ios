@@ -10,18 +10,17 @@ import UIKit
 final class AuthPageViewController: UIPageViewController {
     
     private var isSliding = false
-    private var isFinalVisible = true
+    
     var onPageChange: (Int) -> Void = {_ in }
     
     let pages: [AuthPageController] = [
-        AuthFirstPageController(mainButton: MainButton(title: CSt.buttonStart)),
-        AuthPhoneFieldController(mainButton: MainButton(title: CSt.buttonLogin)),
+//        AuthFirstPageController(mainButton: MainButton(title: CSt.buttonStart)),
+//        AuthPhoneFieldController(mainButton: MainButton(title: CSt.buttonLogin)),
         AuthCodeVerifyController(mainButton: MainButton(title: CSt.requestNewCodeText))
     ]
     
     var currentIndex: Int {
         guard !pages.isEmpty else { return 0 }
-//        return pageControllers[0].pageIndex
         return pages.firstIndex(of: pageControllers[0])!
     }
     
@@ -42,7 +41,6 @@ final class AuthPageViewController: UIPageViewController {
     func nextPage() {
         guard !isSliding else { return }
         guard currentIndex + 1 < pages.count else { return }
-        if (currentIndex + 1) == (pages.count - 1), !(isFinalVisible) { return }
         let nextVC = pages[currentIndex + 1]
         isSliding = true
         setViewControllers([nextVC], direction: .forward, animated: true) { finished in
@@ -62,17 +60,6 @@ final class AuthPageViewController: UIPageViewController {
         onPageChange(currentIndex)
     }
     
-//    @objc func swipe(sender: UISwipeGestureRecognizer) {
-//        switch sender.direction {
-//        case .right:
-//            prevPage()
-//        case .left:
-//            nextPage()
-//        default:
-//            return
-//        }
-//    }
-    
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -81,11 +68,5 @@ final class AuthPageViewController: UIPageViewController {
 private extension AuthPageViewController {
     func setup() {
         isDoubleSided = false
-//        let swipeLeft = UISwipeGestureRecognizer(target: self, action: #selector(swipe(sender:)))
-//        let swipeRight = UISwipeGestureRecognizer(target: self, action: #selector(swipe(sender:)))
-//        swipeLeft.direction = .left
-//        swipeRight.direction = .right
-//        self.view.addGestureRecognizer(swipeLeft)
-//        self.view.addGestureRecognizer(swipeRight)
     }
 }

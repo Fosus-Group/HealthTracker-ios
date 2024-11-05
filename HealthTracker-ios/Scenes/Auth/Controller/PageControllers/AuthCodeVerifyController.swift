@@ -34,22 +34,7 @@ final class AuthCodeVerifyController: AuthPageController {
     
     private var timer: Timer?
     
-    override func prevPage() {
-        codeView.clearCode()
-        super.prevPage()
-    }
-    
-    override func nextPage() {
-        // send request
-//         if success -> nextPage
-        mainButton.isEnabled = false
-        timerLabel.isHidden = false
-        self.countdown = Constants.codeRefreshTime
-        setupTimer()
-        timer?.fireDate = .now + 1
-    }
-    
-    private lazy var countdown: Int = Constants.codeRefreshTime {
+    private var countdown: Int = Constants.codeRefreshTime {
         didSet {
             let minutes = countdown / 60
             let seconds = countdown % 60
@@ -58,7 +43,34 @@ final class AuthCodeVerifyController: AuthPageController {
         }
     }
     
+    private func verifyPhoneNumber(code: String) async throws -> AuthVerifyDTO {
+        guard let phone = (parent?.parent as? AuthController)?.phoneNumber else {
+            throw API.AuthError.phoneNotFound
+        }
+        let auth = try await authService.verifyPhoneNumber(phone: phone, code: code)
+        return auth
+    }
+    
+    override func mainButtonTapped() {
+        guard mainButton.isEnabled else { return }
+        guard let phone = (parent?.parent as? AuthController)?.phoneNumber else { return }
+        setupTimer()
+        Task {
+            await authService.requestPhoneCall(phone: phone)
+        }
+    }
+    
+    override func prevPage() {
+        guard timer == nil else { return }
+        codeView.clearCode()
+        super.prevPage()
+    }
+    
     private func setupTimer() {
+        guard timer == nil else { return }
+        mainButton.isEnabled = false
+        timerLabel.isHidden = false
+        timer?.fireDate = .now + 1
         timer = .scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] timer in
             guard let self else {
                 timer.invalidate()
@@ -67,8 +79,10 @@ final class AuthCodeVerifyController: AuthPageController {
             self.countdown -= 1
             if self.countdown <= 0 {
                 timer.invalidate()
+                self.timer = nil
                 self.mainButton.isEnabled = true
                 self.timerLabel.isHidden = true
+                self.countdown = Constants.codeRefreshTime
             }
         }
     }
@@ -80,7 +94,13 @@ final class AuthCodeVerifyController: AuthPageController {
         view.addSubview(codeView)
         view.addSubview(timerLabel)
         addGestures()
+        setupCodeView()
+        setupTimer()
         super.setup()
+    }
+    
+    private func setupCodeView() {
+        codeView.delegate = self
     }
     
     override func makeConstraints() {
@@ -113,12 +133,34 @@ final class AuthCodeVerifyController: AuthPageController {
     
 }
 
+extension AuthCodeVerifyController: CodeVerifyViewDelegate {
+    func didFillCode(_ code: String) {
+        parent?.view.isUserInteractionEnabled = false
+        
+        Task {
+            do {
+                let authDTO = try await verifyPhoneNumber(code: code)
+                if authDTO.success {
+                    // MARK: TODO
+                    // save token
+                    debugPrint("Success: go to tabbar")
+                } else {
+                    parent?.view.isUserInteractionEnabled = true
+                }
+            } catch let error as ServerError {
+                self.showAlert(title: error.title, message: error.text)
+                parent?.view.isUserInteractionEnabled = true
+            }
+        }
+    }
+}
+
 // MARK: - UI Setup
 private extension AuthCodeVerifyController {
     
     enum Constants {
         static let buttonFont: UIFont = .systemFont(ofSize: 20, weight: .bold)
-        static let codeRefreshTime: Int = 10
+        static let codeRefreshTime: Int = 20
     }
     
     private func addGestures() {
@@ -126,4 +168,15 @@ private extension AuthCodeVerifyController {
         self.view.addGestureRecognizer(tapGesture)
     }
     
+}
+
+
+
+extension UIViewController {
+    func showAlert(title: String, message: String) {
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        let action = UIAlertAction(title: "OK", style: .default, handler: nil)
+        alert.addAction(action)
+        self.present(alert, animated: true, completion: nil)
+    }
 }

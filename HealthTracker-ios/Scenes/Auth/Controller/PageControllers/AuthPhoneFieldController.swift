@@ -13,10 +13,21 @@ final class AuthPhoneFieldController: AuthPageController {
     
     private let phoneMask = try! NSRegularExpression(pattern: "\\(\\d{3}\\) \\d{3}-\\d{2}-\\d{2}")
     
-    @objc override func nextPage() {
-        // send request
-        // if success -> nextPage
-        super.nextPage()
+    var phone: String? {
+        textField.phoneNumber
+    }
+    
+    override func mainButtonTapped() {
+        guard let phone else { return }
+        
+        Task {
+            
+            let result = await authService.requestPhoneCall(phone: phone)
+            
+            if result {
+                super.mainButtonTapped()
+            }
+        }
     }
     
     private func checkMaskMatch(string: String) -> Bool {

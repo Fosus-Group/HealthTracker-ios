@@ -7,12 +7,18 @@
 
 import UIKit
 
+protocol CodeVerifyViewDelegate: AnyObject {
+    func didFillCode(_ code: String)
+}
+
 final class CodeVerifyView: UIView {
     
     private let textField = UITextField()
     private let stackView = UIStackView()
     
     let count: Int
+    
+    weak var delegate: CodeVerifyViewDelegate?
     
     private var labels: [UILabel] {
         stackView.arrangedSubviews as! [UILabel]
@@ -34,34 +40,28 @@ final class CodeVerifyView: UIView {
             clearCode()
             return
         }
-        clearCode()
+        
         text = String(text.prefix(self.count))
         textField.text = text
-        for (index, ch) in text.enumerated() {
-            labels[index].text = String(ch)
+        
+        var textIterator = text.makeIterator()
+        
+        for label in labels {
+            if let ch = textIterator.next() {
+                label.text = String(ch)
+            } else {
+                label.text = ""
+            }
+        }
+        
+        if text.count == self.count {
+            delegate?.didFillCode(text)
         }
     }
     
     @objc private func openKeyboard() {
         textField.becomeFirstResponder()
     }
-    
-    
-    private func makeCodeLabel() -> UILabel {
-        let label = UILabel()
-        label.text = ""
-        label.backgroundColor = .white
-        label.font = Constants.Fonts.button
-        label.textColor = .Main.green
-        label.textAlignment = .center
-        label.layer.cornerRadius = 10
-        label.layer.masksToBounds = true
-        label.snp.makeConstraints { make in
-            make.size.equalTo(Constants.authCodeHeight)
-        }
-        return label
-    }
-    
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -79,6 +79,7 @@ private extension CodeVerifyView {
     }
     
     private func setupStackView() {
+        stackView.isUserInteractionEnabled = false
         stackView.axis = .horizontal
         stackView.distribution = .fillEqually
         stackView.spacing = CSp.medium
@@ -98,5 +99,20 @@ private extension CodeVerifyView {
         stackView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
+    }
+    
+    private func makeCodeLabel() -> UILabel {
+        let label = UILabel()
+        label.text = ""
+        label.backgroundColor = .white
+        label.font = Constants.Fonts.button
+        label.textColor = .Main.green
+        label.textAlignment = .center
+        label.layer.cornerRadius = 10
+        label.layer.masksToBounds = true
+        label.snp.makeConstraints { make in
+            make.size.equalTo(Constants.authCodeHeight)
+        }
+        return label
     }
 }

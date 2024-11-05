@@ -10,16 +10,17 @@ import SnapKit
 
 final class AuthController: UIViewController {
     
-    private let pageController = AuthPageViewController()
+    private let pageViewController = AuthPageViewController()
     private let progressBar: AuthProgessView
     
-    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
-        self.progressBar = AuthProgessView(total: pageController.pages.count)
-        super.init(nibName: nil, bundle: nil)
+    var phoneNumber: String? {
+//        (pageViewController.pages[1] as? AuthPhoneFieldController)?.phone
+        "+79189317604"
     }
     
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
+        self.progressBar = AuthProgessView(total: pageViewController.pages.count)
+        super.init(nibName: nil, bundle: nil)
     }
     
     override func viewDidLoad() {
@@ -32,22 +33,22 @@ final class AuthController: UIViewController {
         updateProgressBarFrame()
     }
     
-    func nextPage() {
-        pageController.nextPage()
-    }
-    
     private var buttonOrigin: CGFloat? {
-        guard !pageController.pageControllers.isEmpty,
-              pageController.pageControllers[0].buttonOrigin > 0  
+        guard !pageViewController.pageControllers.isEmpty,
+              pageViewController.pageControllers[0].buttonOrigin > 0  
         else { return nil }
-        return pageController.pageControllers[0].buttonOrigin
+        return pageViewController.pageControllers[0].buttonOrigin
     }
     
-    func updateProgressBarFrame() {
+    private func updateProgressBarFrame() {
         progressBar.layer.cornerRadius = progressBar.bounds.height / 2
         if let buttonOrigin {
             progressBar.center.y = buttonOrigin - CSp.large.VAdapted
         }
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
 }
 
@@ -59,36 +60,34 @@ private extension AuthController {
     }
     
     func setup() {
+        view.addSubview(progressBar)
+        addChild(pageViewController)
+        view.addSubview(pageViewController.view)
         setupPageController()
         setupProgressBar()
         makeConstraints()
+        
+        pageViewController.didMove(toParent: self)
     }
     
     func setupProgressBar() {
-        view.addSubview(progressBar)
         progressBar.center.x = view.center.x
         progressBar.bounds.size.width = Constants.progressBarWidth
         progressBar.bounds.size.height = Constants.progressBarHeight
     }
     
     func setupPageController() {
-        addChild(pageController)
-        view.addSubview(pageController.view)
-        
-        pageController.onPageChange = { [unowned progressBar] index in
+        pageViewController.onPageChange = { [unowned progressBar] index in
             progressBar.setProgress(index)
         }
     }
     
     func makeConstraints() {
-        
-        pageController.view.snp.makeConstraints { make in
+        pageViewController.view.snp.makeConstraints { make in
             make.top.equalToSuperview()
             make.leading.equalTo(view.safeAreaLayoutGuide)
             make.trailing.equalTo(view.safeAreaLayoutGuide)
             make.bottom.equalTo(view.safeAreaLayoutGuide)
         }
-        
-        pageController.didMove(toParent: self)
     }
 }
