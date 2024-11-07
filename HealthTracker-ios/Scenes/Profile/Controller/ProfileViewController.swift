@@ -37,12 +37,11 @@ final class ProfileViewController: UIViewController {
     
     private let carouselView = CarouselCollectionView()
     
-    private var profileModel: ProfileModel {
-        // TODO: Network request
-        if let saved = ProfileModel.getFromDisk() {
+    private var profileModel: ProfileModel{
+        get {
+            // TODO: Network request
+            let saved = ProfileModel.getFromDisk()
             return saved
-        } else {
-            return ProfileModel(username: "", firstName: "", weight: 0, height: 0, profilePicture: nil)
         }
     }
     

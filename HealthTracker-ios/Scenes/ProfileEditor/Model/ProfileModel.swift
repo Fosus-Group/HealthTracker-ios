@@ -23,7 +23,8 @@ struct ProfileModel {
         
         
         let filemanager = FileManager.default
-        guard let documentDirectory = filemanager.urls(for: .documentDirectory, in: .userDomainMask).first else { return }
+        guard let documentDirectory = filemanager.urls(for: .documentDirectory, in: .userDomainMask).first
+        else { return }
         let imageURL = documentDirectory.appendingPathComponent("profilePicture", conformingTo: .jpeg)
         
         guard let profilePicture else { return }
@@ -42,25 +43,30 @@ struct ProfileModel {
         
     }
     
-    static func getFromDisk() -> ProfileModel? {
-        guard let username = UserDefaults.standard.string(forKey: "username"),
-              let firstName = UserDefaults.standard.string(forKey: "firstName")
-        else {
-            return nil
-        }
+    static func getFromDisk() -> ProfileModel {
+        let username = UserDefaults.standard.string(forKey: "username") ?? ""
+        let firstName = UserDefaults.standard.string(forKey: "firstName") ?? ""
         
         let weight = UserDefaults.standard.double(forKey: "weight")
         let height = UserDefaults.standard.double(forKey: "height")
         
         let filemanager = FileManager.default
-        guard let documentDirectory = filemanager.urls(for: .documentDirectory, in: .userDomainMask).first else { return nil }
-        let imageURL = documentDirectory.appendingPathComponent("profilePicture", conformingTo: .jpeg)
-        
         var image: UIImage?
-        if filemanager.fileExists(atPath: imageURL.path) {
-            image = UIImage(contentsOfFile: imageURL.path)
+        
+        if let documentDirectory = filemanager.urls(for: .documentDirectory, in: .userDomainMask).first {
+            let imageURL = documentDirectory.appendingPathComponent("profilePicture", conformingTo: .jpeg)
+            
+            if filemanager.fileExists(atPath: imageURL.path) {
+                image = UIImage(contentsOfFile: imageURL.path)
+            }
         }
         
-        return ProfileModel(username: username, firstName: firstName, weight: weight, height: height, profilePicture: image)
+        return ProfileModel(
+            username: username,
+            firstName: firstName,
+            weight: weight,
+            height: height,
+            profilePicture: image
+        )
     }
 }
