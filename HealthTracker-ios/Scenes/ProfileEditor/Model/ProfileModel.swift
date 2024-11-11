@@ -44,8 +44,8 @@ struct ProfileModel {
     }
     
     static func getFromDisk() -> ProfileModel {
-        let username = UserDefaults.standard.string(forKey: "username") ?? ""
-        let firstName = UserDefaults.standard.string(forKey: "firstName") ?? ""
+        let username = UserDefaults.standard.string(forKey: "username") ?? CSt.defaultUsername
+        let firstName = UserDefaults.standard.string(forKey: "firstName") ?? CSt.defaultFirstName
         
         let weight = UserDefaults.standard.double(forKey: "weight")
         let height = UserDefaults.standard.double(forKey: "height")

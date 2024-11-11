@@ -22,7 +22,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         self.window = UIWindow(windowScene: windowScene)
         
         let userDefaults = UserDefaults.standard
-        let isAuthorized = userDefaults.bool(forKey: "isAuthorized")
+        let isAuthorized = true//userDefaults.bool(forKey: "isAuthorized")
         
         if isAuthorized {
             self.window?.rootViewController = MainTabBarController()

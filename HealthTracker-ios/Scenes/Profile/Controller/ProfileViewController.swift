@@ -13,7 +13,6 @@ final class ProfileViewController: UIViewController {
     
     private let greetingLabel: UILabel = {
         let lbl = UILabel()
-        lbl.text = CSt.profileGreetingText
         lbl.font = .boldSystemFont(ofSize: 25)
         lbl.numberOfLines = 1
         lbl.textColor = .Main.green
@@ -52,10 +51,71 @@ final class ProfileViewController: UIViewController {
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        
+        layoutView()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.setNavigationBarHidden(true, animated: animated)
+        setupAvatarView()
+        setupGreetingLabel()
+    }
+
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        navigationController?.setNavigationBarHidden(false, animated: animated)
+    }
+    
+    @objc private func editProfileButtonTapped() {
+        let vc = ProfileEditorViewController(profileModel: profileModel)
+        navigationController?.pushViewController(vc, animated: true)
+    }
+    
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+}
+
+extension ProfileViewController {
+    
+    private func setup() {
+        view.layer.insertSublayer(shapeLayer, at: 0)
+        view.addSubview(greetingLabel)
+        view.addSubview(avatarView)
+        view.addSubview(editProfileButton)
+        view.addSubview(carouselView)
+        setupAvatarView()
+        setupEditProfileButton()
+        setupShapeLayer()
+    }
+    
+    private func setupGreetingLabel() {
+        greetingLabel.text = CSt.profileGreetingText + ", " + profileModel.username
+    }
+    
+    private func setupAvatarView() {
+        avatarView.image = profileModel.profilePicture
+    }
+    
+    private func setupEditProfileButton() {
+        editProfileButton.addTarget(self, action: #selector(editProfileButtonTapped), for: .touchUpInside)
+    }
+    
+    private func setupShapeLayer() {
+        shapeLayer.backgroundColor = UIColor.Main.sand.cgColor
+        shapeLayer.cornerRadius = Constants.shapeLayerCornerRadius
+        shapeLayer.maskedCorners = [.layerMinXMaxYCorner, .layerMaxXMaxYCorner]
+        shapeLayer.masksToBounds = true
+        shapeLayer.anchorPoint = .zero
+        shapeLayer.position = .zero
+    }
+    
+    private func layoutView() {
         let safeAreaFrame = view.safeAreaLayoutGuide.layoutFrame
         
-        greetingLabel.sizeToFit()
+        let labelHeight = greetingLabel.intrinsicContentSize.height
+        greetingLabel.bounds.size = CGSize(width: view.bounds.width - CSp.large, height: labelHeight)
         greetingLabel.center = .init(
             x: view.center.x,
             y: safeAreaFrame.minY + greetingLabel.bounds.height / 2 + CSp.large
@@ -88,58 +148,6 @@ final class ProfileViewController: UIViewController {
             x: view.center.x,
             y: editProfileButton.frame.maxY + carouselView.bounds.height / 2
         )
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        navigationController?.setNavigationBarHidden(true, animated: animated)
-        setupAvatarView()
-    }
-
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        navigationController?.setNavigationBarHidden(false, animated: animated)
-    }
-    
-    @objc private func editProfileButtonTapped() {
-        let vc = ProfileEditorViewController(profileModel: profileModel)
-        navigationController?.pushViewController(vc, animated: true)
-    }
-    
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-}
-
-extension ProfileViewController {
-    
-    private func setup() {
-        view.layer.insertSublayer(shapeLayer, at: 0)
-        view.addSubview(greetingLabel)
-        view.addSubview(avatarView)
-        view.addSubview(editProfileButton)
-        view.addSubview(carouselView)
-        setupAvatarView()
-        setupEditProfileButton()
-        setupShapeLayer()
-    }
-    
-    private func setupAvatarView() {
-        avatarView.image = profileModel.profilePicture
-    }
-    
-    private func setupEditProfileButton() {
-        editProfileButton.addTarget(self, action: #selector(editProfileButtonTapped), for: .touchUpInside)
-    }
-    
-    private func setupShapeLayer() {
-        shapeLayer.backgroundColor = UIColor.Main.sand.cgColor
-        shapeLayer.cornerRadius = Constants.shapeLayerCornerRadius
-        shapeLayer.maskedCorners = [.layerMinXMaxYCorner, .layerMaxXMaxYCorner]
-        shapeLayer.masksToBounds = true
-        shapeLayer.anchorPoint = .zero
-        shapeLayer.position = .zero
     }
     
 }

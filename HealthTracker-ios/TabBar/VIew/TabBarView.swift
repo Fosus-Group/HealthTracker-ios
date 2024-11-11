@@ -106,10 +106,7 @@ extension TabBarView {
     
     private func setButtons() {
         self.buttons = TabBarButton.allCases.map { button in
-            let model = TabBarButtonModel(title: button.title, image: button.icon)
-            let btn = makeButton(model: model)
-            btn.tag = button.rawValue
-            if button.rawValue == 0 { btn.isSelected = true }
+            let btn = makeButton(buttonType: button)
             
             addSubview(btn)
             btn.addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)
@@ -118,21 +115,20 @@ extension TabBarView {
         }
     }
     
-    private func makeButton(model: TabBarButtonModel) -> UIButton {
+    private func makeButton(buttonType: TabBarButton) -> UIButton {
         var config = UIButton.Configuration.plain()
         config.background.backgroundColor = .clear
-        config.image = model.image
+        config.image = buttonType.icon
         config.imagePlacement = .leading
         config.imagePadding = CSp.min
         
         var attributeContainer = AttributeContainer()
         attributeContainer.font = .systemFont(ofSize: 13, weight: .bold)
-        let attributedTitle = AttributedString(model.title, attributes: attributeContainer)
+        let attributedTitle = AttributedString(buttonType.title, attributes: attributeContainer)
         config.attributedTitle = attributedTitle
         
         let btn = UIButton(configuration: config)
         btn.clipsToBounds = true
-        btn.imageView?.contentMode = .scaleAspectFit
         btn.configurationUpdateHandler = { btn in
             switch btn.state {
             case .selected:
@@ -145,6 +141,9 @@ extension TabBarView {
                 break
             }
         }
+        
+        btn.tag = buttonType.rawValue
+        if buttonType.rawValue == 0 { btn.isSelected = true }
         
         return btn
     }

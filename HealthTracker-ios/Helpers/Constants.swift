@@ -42,6 +42,8 @@ enum Constants {
         static let requestNewCodeText = "Запросить новый код"
         
         // MARK: Profile
+        static let defaultUsername = ""
+        static let defaultFirstName = "Аноним"
         static let profileGreetingText = "Привет"
         static let editProfileButtonText = "Редактировать профиль"
         

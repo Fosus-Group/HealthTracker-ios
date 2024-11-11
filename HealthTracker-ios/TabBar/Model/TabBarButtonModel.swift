@@ -7,12 +7,6 @@
 
 import UIKit
 
-struct TabBarButtonModel {
-    let title: String
-    let image: UIImage?
-}
-
-
 enum TabBarButton: Int, CaseIterable {
     case profile
     case stats
