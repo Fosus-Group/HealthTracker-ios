@@ -11,8 +11,6 @@ enum API: RawRepresentable {
     
     typealias RawValue = String
     
-    static let baseURL = URL(string: "https://d5d344h7p2lb2srofdnv.apigw.yandexcloud.net")!
-    
     case userCall(_ phone: String)
     case userVerify(_ phone: String, _ code: String)
     
@@ -62,11 +60,14 @@ enum API: RawRepresentable {
     }
     
     var url: URL? {
-        var components = URLComponents(string: Self.baseURL.absoluteString)
+        let environment = BuildConfiguration.shared.environment
+        var components = URLComponents()
+        components.scheme = environment.scheme
+        components.host = environment.host
+        components.port = environment.port
+        components.path = path
         
-        components?.path = path
-        
-        return components?.url
+        return components.url
     }
 }
 
