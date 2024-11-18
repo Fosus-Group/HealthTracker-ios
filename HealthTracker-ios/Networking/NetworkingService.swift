@@ -7,7 +7,16 @@
 
 import Foundation
 
-final class NetworkingService {
+protocol NetworkingServiceProtocol: AnyObject {
+    func makeRequest(api: API, allowRetry: Bool) async throws -> Data
+    func makeRequest<T: Decodable>(api: API, of type: T.Type) async throws -> T
+    func refreshToken(_ refresh: String) async throws -> Token
+    func saveToken(_ token: Token) async
+}
+
+final class NetworkingService: NetworkingServiceProtocol {
+    
+    static let shared = NetworkingService()
     
     private let decoder: JSONDecoder = {
         let decoder = JSONDecoder()
@@ -15,14 +24,12 @@ final class NetworkingService {
         return decoder
     }()
     
-    static let shared = NetworkingService()
+    private let authManager = AuthManager()
     
-    private init() { }
-    
-    var accessToken: String = ""
+    private init() {}
     
     @MainActor
-    func makeRequest(api: API) async throws -> Data {
+    func makeRequest(api: API, allowRetry: Bool = true) async throws -> Data {
         
         guard let url = api.url else {
             throw URLError(.badURL)
@@ -32,7 +39,8 @@ final class NetworkingService {
         request.httpMethod = api.method.rawValue
         
         if api.usesAccessToken {
-            request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+            let token = try await authManager.validToken()
+            request.setValue("Bearer \(token.accessToken)", forHTTPHeaderField: "Authorization")
         }
         
         let httpBody = try JSONSerialization.data(withJSONObject: api.body)
@@ -50,9 +58,12 @@ final class NetworkingService {
         // check for refresh
         if let httpResponse = response as? HTTPURLResponse {
             if httpResponse.statusCode == 403 {
-                // TODO: POST: /api/user/refresh
+                if allowRetry {
+                    _ = try await authManager.refreshToken()
+                    return try await makeRequest(api: api, allowRetry: false)
+                }
                 
-                debugPrint("need refresh")
+                throw API.AuthError.invalidToken
             }
         }
         
@@ -75,6 +86,17 @@ final class NetworkingService {
             throw serverError
         }
         
+    }
+    
+    func refreshToken(_ refresh: String) async throws -> Token {
+        let api = API.refresh(refresh)
+        let result = try await makeRequest(api: api, of: Token.DTO.self)
+        
+        return Token.fromDTO(result)
+    }
+    
+    func saveToken(_ token: Token) async {
+        await authManager.saveToken(token)
     }
     
 }

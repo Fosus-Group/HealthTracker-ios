@@ -10,5 +10,7 @@ import Foundation
 extension API {
     enum AuthError: Error {
         case phoneNotFound
+        case missingToken
+        case invalidToken
     }
 }

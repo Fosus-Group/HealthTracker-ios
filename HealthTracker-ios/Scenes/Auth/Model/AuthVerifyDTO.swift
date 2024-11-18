@@ -13,13 +13,3 @@ struct AuthVerifyDTO: Decodable {
     let accessToken: String
     let refreshToken: String
 }
-
-struct ServerError: Decodable {
-    let type: String
-    let title: String
-    let text: String
-    let status: Int
-//    let detail: [Any]
-}
-
-extension ServerError: Error {}

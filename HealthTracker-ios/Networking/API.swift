@@ -14,6 +14,8 @@ enum API: RawRepresentable {
     case userCall(_ phone: String)
     case userVerify(_ phone: String, _ code: String)
     
+    case refresh(_ refresh: String)
+    
     init?(rawValue: String) { nil }
     
     var rawValue: String {
@@ -22,6 +24,8 @@ enum API: RawRepresentable {
             return "user/call"
         case .userVerify:
             return "user/verify"
+        case .refresh:
+            return "user/refresh"
         }
     }
     
@@ -31,7 +35,7 @@ enum API: RawRepresentable {
     
     var method: HttpMethod {
         switch self {
-        case .userCall, .userVerify:
+        case .userCall, .userVerify, .refresh:
             return .post
         default:
             return .get

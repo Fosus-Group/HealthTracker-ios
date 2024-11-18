@@ -143,12 +143,23 @@ extension AuthCodeVerifyController: CodeVerifyViewDelegate {
                 if authDTO.success {
                     // MARK: TODO
                     // save token
-                    debugPrint("Success: go to tabbar")
+                    // add coordinator
+                    UserDefaults.standard.set(true, forKey: "isAuthorized")
+                    let authorization = Authorization.fromDTO(authDTO)
+                    let token = Token.fromDTO(authorization)
+                    await NetworkingService.shared.saveToken(token)
+                    UIApplication.shared.window?.rootViewController = MainTabBarController()
                 } else {
                     parent?.view.isUserInteractionEnabled = true
                 }
-            } catch let error as ServerError {
-                self.showAlert(title: error.title, message: error.text)
+            } catch {
+                var title = "Error"
+                var message = error.localizedDescription
+                if let serverError = error as? ServerError {
+                    title = serverError.title
+                    message = serverError.text
+                }
+                self.showAlert(title: title, message: message)
                 parent?.view.isUserInteractionEnabled = true
             }
         }

@@ -34,6 +34,4 @@ struct AuthService: AuthServiceProtocol {
         
         return result
     }
-    
-    
 }
