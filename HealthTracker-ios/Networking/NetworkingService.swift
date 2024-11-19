@@ -41,8 +41,13 @@ final class NetworkingService: NetworkingServiceProtocol {
         request.httpMethod = apiRequest.method.rawValue
         
         if apiRequest.usesAccessToken {
-            let token = try await authManager.validToken()
-            request.setValue("Bearer \(token.accessToken)", forHTTPHeaderField: "Authorization")
+            if apiRequest.url.lastPathComponent == "refresh" {
+                guard let token = await authManager.currentToken else { throw AuthManager.TokenError.missingToken }
+                request.setValue("Bearer \(token.refreshToken)", forHTTPHeaderField: "Authorization")
+            } else {
+                let token = try await authManager.validToken()
+                request.setValue("Bearer \(token.accessToken)", forHTTPHeaderField: "Authorization")
+            }
         }
         
         if let formData = apiRequest.formData {
