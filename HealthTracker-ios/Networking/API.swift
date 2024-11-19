@@ -15,6 +15,8 @@ enum API: RawRepresentable {
     case userCall(_ phone: String)
     case userVerify(_ phone: String, _ code: String)
     case userMe
+    case userUpdate(_ username: String, _ height: Double)
+    case userUpload(_ image: Data)
     
     // MARK: Auth
     case refresh(_ refresh: String)
@@ -29,6 +31,10 @@ enum API: RawRepresentable {
             return "user/verify"
         case .userMe:
             return "user/me"
+        case .userUpdate:
+            return "user/update"
+        case .userUpload:
+            return "user/upload"
         case .refresh:
             return "user/refresh"
         }
@@ -42,6 +48,8 @@ enum API: RawRepresentable {
         switch self {
         case .userCall, .userVerify, .refresh:
             return .post
+        case .userUpdate:
+            return .put
         default:
             return .get
         }
@@ -49,7 +57,7 @@ enum API: RawRepresentable {
     
     var usesAccessToken: Bool {
         switch self {
-        case .userCall, .userVerify:
+        case .userCall, .userVerify, .userUpload:
             return false
         default:
             return true
@@ -63,6 +71,10 @@ enum API: RawRepresentable {
             return ["phone_number": phone]
         case .userVerify(let phone, let code):
             return ["phone_number": phone, "code": code]
+        case .userUpdate(let username, let height):
+            return ["username": username, "height": height]
+        case .userUpload(let image):
+            return ["file": image]
         default:
             return [:]
         }
@@ -90,5 +102,7 @@ extension API {
     enum HttpMethod: String {
         case get = "GET"
         case post = "POST"
+        case put = "PUT"
+        case delete = "DELETE"
     }
 }

@@ -10,6 +10,8 @@ import UIKit.UIImage
 protocol ProfileServiceProtocol {
     func loadProfile() async throws -> ProfileModel
     func loadImage(hex: String) async throws -> UIImage
+    
+    func updateProfile(_ profile: ProfileModel) async throws -> ProfileModel
 }
 
 struct ProfileService: ProfileServiceProtocol {
@@ -50,5 +52,21 @@ struct ProfileService: ProfileServiceProtocol {
         } else {
             throw ImageError.corruptedData
         }
+    }
+    
+    func updateProfile(_ profile: ProfileModel) async throws -> ProfileModel {
+        let api = API.userUpdate(profile.username, profile.height)
+        
+        let result = try await networking.makeRequest(api: api, of: ProfileModel.DTO.self)
+        
+        return ProfileModel.fromDTO(result)
+    }
+    
+    func updateImage(_ image: Data) async throws -> Bool {
+        let api = API.userUpload(image)
+        
+        let result = try await networking.makeRequest(api: api, of: [String: Bool].self)
+        
+        return result["success"] ?? false
     }
 }
