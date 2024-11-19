@@ -70,7 +70,7 @@ final class ProfileViewController: UIViewController {
     }
     
     @objc private func editProfileButtonTapped() {
-        let vc = ProfileEditorViewController(profileModel: profileModel)
+        let vc = ProfileEditorViewController(profileModel: profileModel, service: profileService)
         vc.onSave = { [weak self] profileModel in
             self?.profileModel = profileModel
         }

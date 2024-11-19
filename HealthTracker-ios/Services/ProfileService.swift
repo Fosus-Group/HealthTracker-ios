@@ -12,6 +12,7 @@ protocol ProfileServiceProtocol {
     func loadImage(hex: String) async throws -> UIImage
     
     func updateProfile(_ profile: ProfileModel) async throws -> ProfileModel
+    func updateImage(_ imageData: Data) async throws -> Bool
 }
 
 struct ProfileService: ProfileServiceProtocol {
@@ -62,8 +63,8 @@ struct ProfileService: ProfileServiceProtocol {
         return ProfileModel.fromDTO(result)
     }
     
-    func updateImage(_ image: Data) async throws -> Bool {
-        let api = API.userUpload(image)
+    func updateImage(_ imageData: Data) async throws -> Bool {
+        let api = API.userUpload(imageData)
         
         let result = try await networking.makeRequest(api: api, of: [String: Bool].self)
         

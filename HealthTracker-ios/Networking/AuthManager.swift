@@ -15,7 +15,7 @@ actor AuthManager {
     }
     
     private weak var networking: NetworkingService?
-    private var currentToken: Token?
+    private(set) var currentToken: Token?
     private var refreshTask: Task<Token, Error>?
     
     init(networking: NetworkingService) {

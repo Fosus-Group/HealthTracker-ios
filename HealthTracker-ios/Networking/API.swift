@@ -16,7 +16,7 @@ enum API: RawRepresentable {
     case userVerify(_ phone: String, _ code: String)
     case userMe
     case userUpdate(_ username: String, _ height: Double)
-    case userUpload(_ image: Data)
+    case userUpload(_ imageData: Data)
     
     // MARK: Auth
     case refresh(_ refresh: String)
@@ -48,7 +48,7 @@ enum API: RawRepresentable {
         switch self {
         case .userCall, .userVerify, .refresh:
             return .post
-        case .userUpdate:
+        case .userUpdate, .userUpload:
             return .put
         default:
             return .get
@@ -57,7 +57,7 @@ enum API: RawRepresentable {
     
     var usesAccessToken: Bool {
         switch self {
-        case .userCall, .userVerify, .userUpload:
+        case .userCall, .userVerify:
             return false
         default:
             return true
@@ -73,8 +73,6 @@ enum API: RawRepresentable {
             return ["phone_number": phone, "code": code]
         case .userUpdate(let username, let height):
             return ["username": username, "height": height]
-        case .userUpload(let image):
-            return ["file": image]
         default:
             return [:]
         }
@@ -84,6 +82,17 @@ enum API: RawRepresentable {
         let data = try? JSONSerialization.data(withJSONObject: body)
 
         return data
+    }
+    
+    var muliPart: MultipartFormData? {
+        switch self {
+        case .userUpload(let imageData):
+            let formData = FormData(key: "file", fileData: imageData, mimeType: "image/jpeg")
+            let multipart = MultipartFormData(fields: [formData])
+            return multipart
+        default:
+            return nil
+        }
     }
     
     var url: URL? {

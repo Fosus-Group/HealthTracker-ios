@@ -10,6 +10,8 @@ import PhotosUI.PHPicker
 
 final class ProfileEditorViewController: UIViewController {
     
+    private let profileService: ProfileServiceProtocol
+    
     private(set) var profileModel: ProfileModel
     
     private let avatarView = AvatarView()
@@ -47,7 +49,9 @@ final class ProfileEditorViewController: UIViewController {
     
     private var editingTextFieldIndex: Int = 0
     
-    init(profileModel: ProfileModel) {
+    // MARK: - Initializer
+    init(profileModel: ProfileModel, service: ProfileServiceProtocol) {
+        self.profileService = service
         self.profileModel = profileModel
         super.init(nibName: nil, bundle: nil)
         hidesBottomBarWhenPushed = true
@@ -82,11 +86,18 @@ final class ProfileEditorViewController: UIViewController {
             profilePicture: avatarView.image
         )
         
+        Task {
+            try await profileService.updateProfile(profileModel)
+        }
         
-        profileModel.saveToDisk()
-        navigationController?.popViewController(animated: true)
+        if let data = profileModel.saveToDisk() {
+            Task {
+                try await profileService.updateImage(data)
+            }
+        }
         
         onSave?(profileModel)
+        navigationController?.popViewController(animated: true)
     }
     
     @objc private func dismissKeyboard() {
@@ -174,6 +185,7 @@ extension ProfileEditorViewController: UITextFieldDelegate {
     }
 }
 
+// MARK: PHPickerDelegate
 extension ProfileEditorViewController: PHPickerViewControllerDelegate {
     func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
         picker.dismiss(animated: true)

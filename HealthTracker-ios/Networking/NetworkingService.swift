@@ -45,12 +45,17 @@ final class NetworkingService: NetworkingServiceProtocol {
             request.setValue("Bearer \(token.accessToken)", forHTTPHeaderField: "Authorization")
         }
         
-        if !apiRequest.body.isEmpty {
-            let httpBody = try JSONSerialization.data(withJSONObject: apiRequest.body)
-            request.httpBody = httpBody
-
+        if let formData = apiRequest.formData {
+            let (body, contentType) = formData.build()
+            request.httpBody = body
+            request.setValue(contentType, forHTTPHeaderField: "Content-Type")
+        } else {
+            if !apiRequest.body.isEmpty {
+                let httpBody = try JSONSerialization.data(withJSONObject: apiRequest.body)
+                request.httpBody = httpBody
+            }
+            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         }
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         
         let (data, response) = try await URLSession.shared.data(for: request)
         
@@ -127,12 +132,20 @@ extension API {
         let url: URL
         let method: HttpMethod
         let body: [String: Any]
+        let formData: MultipartFormData?
         let usesAccessToken: Bool
         
-        init(url: URL, method: HttpMethod, body: [String: Any], usesAccessToken: Bool) {
+        init(
+            url: URL,
+            method: HttpMethod,
+            body: [String : Any],
+            formData: MultipartFormData?,
+            usesAccessToken: Bool
+        ) {
             self.url = url
             self.method = method
             self.body = body
+            self.formData = formData
             self.usesAccessToken = usesAccessToken
         }
         
@@ -144,11 +157,17 @@ extension API {
             self.usesAccessToken = api.usesAccessToken
             self.method = api.method
             self.body = api.body
+            self.formData = api.muliPart
         }
         
-        
         static func get(url: URL, usesAccessToken: Bool = false) -> Request {
-            Request(url: url, method: .get, body: [:], usesAccessToken: usesAccessToken)
+            Request(
+                url: url,
+                method: .get,
+                body: [:],
+                formData: nil,
+                usesAccessToken: usesAccessToken
+            )
         }
     }
 }

@@ -17,32 +17,13 @@ struct ProfileModel {
 }
 
 extension ProfileModel {
-    func saveToDisk() {
+    func saveToDisk() -> Data? {
         UserDefaults.standard.set(username, forKey: "username")
         UserDefaults.standard.set(firstName, forKey: "firstName")
         UserDefaults.standard.set(weight, forKey: "weight")
         UserDefaults.standard.set(height, forKey: "height")
         
-        
-        let filemanager = FileManager.default
-        guard let documentDirectory = filemanager.urls(for: .documentDirectory, in: .userDomainMask).first
-        else { return }
-        let imageURL = documentDirectory.appendingPathComponent("profilePicture", conformingTo: .jpeg)
-        
-        guard let profilePicture else { return }
-        
-        let imageRenderer = UIGraphicsImageRenderer(size: .init(width: 100, height: 100))
-        let data = imageRenderer.jpegData(withCompressionQuality: 1) { context in
-            let rect = CGRect(origin: .zero, size: .init(width: 100, height: 100))
-            profilePicture.draw(in: rect)
-        }
-        
-        do {
-            try data.write(to: imageURL)
-        } catch {
-            debugPrint(error)
-        }
-        
+        return profilePicture?.cacheProfilePicture(withName: "profilePicture")
     }
     
     static func getFromDisk() -> ProfileModel {
@@ -53,16 +34,7 @@ extension ProfileModel {
         let weight = UserDefaults.standard.double(forKey: "weight")
         let height = UserDefaults.standard.double(forKey: "height")
         
-        let filemanager = FileManager.default
-        var image: UIImage?
-        
-        if let documentDirectory = filemanager.urls(for: .documentDirectory, in: .userDomainMask).first {
-            let imageURL = documentDirectory.appendingPathComponent("profilePicture", conformingTo: .jpeg)
-            
-            if filemanager.fileExists(atPath: imageURL.path) {
-                image = UIImage(contentsOfFile: imageURL.path)
-            }
-        }
+        let image: UIImage? = .getProfilePicture(withName: "profilePicture")
         
         return ProfileModel(
             phoneNumber: phoneNumber,
