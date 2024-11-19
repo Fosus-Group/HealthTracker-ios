@@ -36,6 +36,22 @@ final class MainTabBarController: UITabBarController {
 private extension MainTabBarController {
     func setup() {
         viewControllers = TabBarButton.allCases.map { generateViewController($0) }
+        
+        Task {
+            let service = ProfileService(networking: NetworkingService.shared)
+            let profile: ProfileModel
+            do {
+                profile = try await service.loadProfile()
+            } catch {
+                self.showAlert(error: error)
+                profile = ProfileModel.getFromDisk()
+            }
+            let vc = ProfileViewController(profileService: service, profileModel: profile)
+            let nav = UINavigationController(rootViewController: vc)
+            viewControllers?[0] = nav
+            tabBar.bringSubviewToFront(tabbarView)
+        }
+        
         setupTabBar()
     }
     
@@ -47,14 +63,7 @@ private extension MainTabBarController {
     private func generateViewController(_ type: TabBarButton) -> UIViewController {
         let defaultVC = UIViewController()
         defaultVC.view.backgroundColor = .black
-        switch type {
-        case .profile:
-            let vc = ProfileViewController()
-            let nav = UINavigationController(rootViewController: vc)
-            return nav
-        default:
-            return defaultVC
-        }
+        return defaultVC
     }
 }
 

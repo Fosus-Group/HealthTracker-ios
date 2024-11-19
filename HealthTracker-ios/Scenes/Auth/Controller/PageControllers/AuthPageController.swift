@@ -14,7 +14,7 @@ class AuthPageController: UIViewController {
     
     let mainButton: MainButton
     let shapeLayer = CALayer()
-    let authService: AuthServiceProtocol = AuthService()
+    let authService: AuthServiceProtocol = AuthService(networking: NetworkingService.shared)
     
     var buttonOrigin: CGFloat {
         self.mainButton.frame.origin.y

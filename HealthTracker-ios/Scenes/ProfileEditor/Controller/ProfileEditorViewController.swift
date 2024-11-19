@@ -43,6 +43,8 @@ final class ProfileEditorViewController: UIViewController {
         return true
     }
     
+    var onSave: ((ProfileModel) -> Void)?
+    
     private var editingTextFieldIndex: Int = 0
     
     init(profileModel: ProfileModel) {
@@ -72,6 +74,7 @@ final class ProfileEditorViewController: UIViewController {
         else { return }
               
         let profileModel = ProfileModel(
+            phoneNumber: profileModel.phoneNumber,
             username: username,
             firstName: firstName,
             weight: weight,
@@ -82,6 +85,8 @@ final class ProfileEditorViewController: UIViewController {
         
         profileModel.saveToDisk()
         navigationController?.popViewController(animated: true)
+        
+        onSave?(profileModel)
     }
     
     @objc private func dismissKeyboard() {

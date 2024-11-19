@@ -9,6 +9,8 @@ import UIKit
 
 final class ProfileViewController: UIViewController {
     
+    private let profileService: ProfileServiceProtocol
+    
     private let shapeLayer = CALayer()
     
     private let greetingLabel: UILabel = {
@@ -36,15 +38,16 @@ final class ProfileViewController: UIViewController {
     
     private let carouselView = CarouselCollectionView()
     
-    private var profileModel: ProfileModel{
-        get {
-            // TODO: Network request
-            let saved = ProfileModel.getFromDisk()
-            return saved
+    private var profileModel: ProfileModel {
+        didSet {
+            setupAvatarView()
+            setupGreetingLabel()
         }
     }
     
-    init() {
+    init(profileService: ProfileServiceProtocol, profileModel: ProfileModel) {
+        self.profileService = profileService
+        self.profileModel = profileModel
         super.init(nibName: nil, bundle: nil)
         setup()
     }
@@ -68,6 +71,9 @@ final class ProfileViewController: UIViewController {
     
     @objc private func editProfileButtonTapped() {
         let vc = ProfileEditorViewController(profileModel: profileModel)
+        vc.onSave = { [weak self] profileModel in
+            self?.profileModel = profileModel
+        }
         navigationController?.pushViewController(vc, animated: true)
     }
     

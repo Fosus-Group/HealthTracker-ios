@@ -30,7 +30,7 @@ extension Token: DTOConvertible {
     static func fromDTO(_ dto: Authorization) -> Self {
         Self(
             authorization: dto,
-            expireDate: .now
+            expireDate: .now + 43200 * 60
         )
     }
 }

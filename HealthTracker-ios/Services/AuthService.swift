@@ -14,12 +14,16 @@ protocol AuthServiceProtocol {
 
 struct AuthService: AuthServiceProtocol {
     
-    private let networkService = NetworkingService.shared
+    private let networking: NetworkingServiceProtocol
+    
+    init(networking: NetworkingServiceProtocol) {
+        self.networking = networking
+    }
     
     func requestPhoneCall(phone: String) async -> Bool {
         let api = API.userCall(phone)
         do {
-            let result = try await networkService.makeRequest(api: api, of: AuthUserCallDTO.self)
+            let result = try await networking.makeRequest(api: api, of: AuthUserCallDTO.self)
             return result.success
         } catch {
             
@@ -30,7 +34,7 @@ struct AuthService: AuthServiceProtocol {
     
     func verifyPhoneNumber(phone: String, code: String) async throws -> AuthVerifyDTO {
         let api = API.userVerify(phone, code)
-        let result = try await networkService.makeRequest(api: api, of: AuthVerifyDTO.self)
+        let result = try await networking.makeRequest(api: api, of: AuthVerifyDTO.self)
         
         return result
     }

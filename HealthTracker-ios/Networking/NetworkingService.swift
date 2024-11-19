@@ -8,7 +8,9 @@
 import Foundation
 
 protocol NetworkingServiceProtocol: AnyObject {
-    func makeRequest(api: API, allowRetry: Bool) async throws -> Data
+    func makeRequest(apiRequest: API.Request, allowRetry: Bool) async throws -> Data
+    func makeRequest<T: Decodable>(apiRequest: API.Request, ofType type: T.Type) async throws -> T
+    func makeRequest(api: API) async throws -> Data
     func makeRequest<T: Decodable>(api: API, of type: T.Type) async throws -> T
     func refreshToken(_ refresh: String) async throws -> Token
     func saveToken(_ token: Token) async
@@ -18,41 +20,42 @@ final class NetworkingService: NetworkingServiceProtocol {
     
     static let shared = NetworkingService()
     
+    private let logger = Logger()
+    
+    private lazy var authManager: AuthManager = .init(networking: self)
+    
     private let decoder: JSONDecoder = {
         let decoder = JSONDecoder()
         decoder.keyDecodingStrategy = .convertFromSnakeCase
         return decoder
     }()
     
-    private let authManager = AuthManager()
-    
     private init() {}
     
+    // MARK: - Methdods
     @MainActor
-    func makeRequest(api: API, allowRetry: Bool = true) async throws -> Data {
+    func makeRequest(apiRequest: API.Request, allowRetry: Bool) async throws -> Data {
         
-        guard let url = api.url else {
-            throw URLError(.badURL)
-        }
+        var request = URLRequest(url: apiRequest.url)
         
-        var request = URLRequest(url: url)
-        request.httpMethod = api.method.rawValue
+        request.httpMethod = apiRequest.method.rawValue
         
-        if api.usesAccessToken {
+        if apiRequest.usesAccessToken {
             let token = try await authManager.validToken()
             request.setValue("Bearer \(token.accessToken)", forHTTPHeaderField: "Authorization")
         }
         
-        let httpBody = try JSONSerialization.data(withJSONObject: api.body)
-        request.httpBody = httpBody
-        
+        if !apiRequest.body.isEmpty {
+            let httpBody = try JSONSerialization.data(withJSONObject: apiRequest.body)
+            request.httpBody = httpBody
+
+        }
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         
         let (data, response) = try await URLSession.shared.data(for: request)
         
 #if DEBUG
-        let jsonString = String(data: data, encoding: .utf8) ?? "No data"
-        debugPrint("\(api.method) \(url): \(jsonString)")
+        logger.log(request: request, response: response, data: data)
 #endif
         
         // check for refresh
@@ -60,10 +63,10 @@ final class NetworkingService: NetworkingServiceProtocol {
             if httpResponse.statusCode == 403 {
                 if allowRetry {
                     _ = try await authManager.refreshToken()
-                    return try await makeRequest(api: api, allowRetry: false)
+                    return try await makeRequest(apiRequest: apiRequest, allowRetry: false)
                 }
                 
-                throw API.AuthError.invalidToken
+                throw AuthManager.TokenError.invalidToken
             }
         }
         
@@ -71,21 +74,25 @@ final class NetworkingService: NetworkingServiceProtocol {
     }
     
     @MainActor
-    func makeRequest<T: Decodable>(api: API, of type: T.Type) async throws -> T {
+    func makeRequest<T: Decodable>(apiRequest: API.Request, ofType type: T.Type) async throws -> T {
+        let data = try await makeRequest(apiRequest: apiRequest, allowRetry: true)
         
+        return try decode(data)
+    }
+    
+    
+    @MainActor
+    func makeRequest(api: API) async throws -> Data {
+        let apiRequest = try API.Request(api: api)
+        
+        return try await makeRequest(apiRequest: apiRequest, allowRetry: true)
+    }
+    
+    @MainActor
+    func makeRequest<T: Decodable>(api: API, of type: T.Type) async throws -> T {
         let data = try await makeRequest(api: api)
         
-        do {
-            let decoded = try decoder.decode(T.self, from: data)
-            return decoded
-        } catch {
-            guard let serverError = try? decoder.decode(ServerError.self, from: data) else {
-                throw error
-            }
-            
-            throw serverError
-        }
-        
+        return try decode(data)
     }
     
     func refreshToken(_ refresh: String) async throws -> Token {
@@ -99,4 +106,72 @@ final class NetworkingService: NetworkingServiceProtocol {
         await authManager.saveToken(token)
     }
     
+    
+    private func decode<T: Decodable>(_ data: Data) throws -> T {
+        do {
+            let decoded = try decoder.decode(T.self, from: data)
+            return decoded
+        } catch {
+            guard let serverError = try? decoder.decode(ServerError.self, from: data) else {
+                throw error
+            }
+            
+            throw serverError
+        }
+    }
+}
+
+
+extension API {
+    struct Request {
+        let url: URL
+        let method: HttpMethod
+        let body: [String: Any]
+        let usesAccessToken: Bool
+        
+        init(url: URL, method: HttpMethod, body: [String: Any], usesAccessToken: Bool) {
+            self.url = url
+            self.method = method
+            self.body = body
+            self.usesAccessToken = usesAccessToken
+        }
+        
+        init(api: API) throws {
+            guard let url = api.url else {
+                throw URLError(.badURL)
+            }
+            self.url = url
+            self.usesAccessToken = api.usesAccessToken
+            self.method = api.method
+            self.body = api.body
+        }
+        
+        
+        static func get(url: URL, usesAccessToken: Bool = false) -> Request {
+            Request(url: url, method: .get, body: [:], usesAccessToken: usesAccessToken)
+        }
+    }
+}
+
+
+struct Logger {
+    func log(request: URLRequest, response: URLResponse, data: Data) {
+        guard let httpResponse = response as? HTTPURLResponse else { return }
+        let statusCode = httpResponse.statusCode
+        let authorizationHeader = request.value(forHTTPHeaderField: "Authorization")
+        
+        let jsonString = String(data: data, encoding: .utf8) ?? "No data"
+        let httpMethod = request.httpMethod ?? "No method"
+        let url = request.url?.absoluteString ?? "No url"
+        
+        let output: String = {
+            if let authorizationHeader {
+                return "\(httpMethod) \(url) \(statusCode) \(authorizationHeader) \(jsonString)"
+            } else {
+                return "\(httpMethod) \(url) \(statusCode) \(jsonString)"
+            }
+        }()
+        
+        print(output)
+    }
 }

@@ -8,9 +8,26 @@
 import Foundation
 
 actor AuthManager {
-    private lazy var networking = NetworkingService.shared
+    enum TokenError: Error {
+        case invalidConfiguration
+        case missingToken
+        case invalidToken
+    }
+    
+    private weak var networking: NetworkingService?
     private var currentToken: Token?
     private var refreshTask: Task<Token, Error>?
+    
+    init(networking: NetworkingService) {
+        if let accessToken = UserDefaults.standard.string(forKey: "accessToken"),
+           let refreshToken = UserDefaults.standard.string(forKey: "refreshToken")
+        {
+            let authorization = Authorization(accessToken: accessToken, refreshToken: refreshToken)
+            let token = Token(authorization: authorization, expireDate: .now + 43200 * 60)
+            self.currentToken = token
+        }
+        self.networking = networking
+    }
 
     func validToken() async throws -> Token {
         if let handle = refreshTask {
@@ -18,7 +35,7 @@ actor AuthManager {
         }
 
         guard let token = currentToken else {
-            throw API.AuthError.missingToken
+            throw TokenError.missingToken
         }
 
         // TODO: Check if token is valid (Date)
@@ -38,7 +55,8 @@ actor AuthManager {
         let task = Task { () throws -> Token in
             defer { refreshTask = nil }
 
-            guard let currentToken else { throw API.AuthError.missingToken }
+            guard let currentToken else { throw TokenError.missingToken }
+            guard let networking else { throw TokenError.invalidConfiguration }
             
             let newToken = try await networking.refreshToken(currentToken.refreshToken)
             

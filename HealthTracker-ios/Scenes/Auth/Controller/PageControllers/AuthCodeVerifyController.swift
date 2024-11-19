@@ -146,6 +146,8 @@ extension AuthCodeVerifyController: CodeVerifyViewDelegate {
                     // add coordinator
                     UserDefaults.standard.set(true, forKey: "isAuthorized")
                     let authorization = Authorization.fromDTO(authDTO)
+                    UserDefaults.standard.set(authorization.accessToken, forKey: "accessToken")
+                    UserDefaults.standard.set(authorization.refreshToken, forKey: "refreshToken")
                     let token = Token.fromDTO(authorization)
                     await NetworkingService.shared.saveToken(token)
                     UIApplication.shared.window?.rootViewController = MainTabBarController()
@@ -153,13 +155,7 @@ extension AuthCodeVerifyController: CodeVerifyViewDelegate {
                     parent?.view.isUserInteractionEnabled = true
                 }
             } catch {
-                var title = "Error"
-                var message = error.localizedDescription
-                if let serverError = error as? ServerError {
-                    title = serverError.title
-                    message = serverError.text
-                }
-                self.showAlert(title: title, message: message)
+                self.showAlert(error: error)
                 parent?.view.isUserInteractionEnabled = true
             }
         }
@@ -184,7 +180,16 @@ private extension AuthCodeVerifyController {
 
 
 extension UIViewController {
-    func showAlert(title: String, message: String) {
+    func showAlert(error: Error) {
+        let title: String
+        let message: String
+        if let serverError = error as? ServerError {
+            title = serverError.title
+            message = serverError.text
+        } else {
+            title = "Error"
+            message = error.localizedDescription
+        }
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
         let action = UIAlertAction(title: "OK", style: .default, handler: nil)
         alert.addAction(action)

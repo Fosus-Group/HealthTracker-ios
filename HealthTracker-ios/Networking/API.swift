@@ -11,9 +11,12 @@ enum API: RawRepresentable {
     
     typealias RawValue = String
     
+    // MARK: User
     case userCall(_ phone: String)
     case userVerify(_ phone: String, _ code: String)
+    case userMe
     
+    // MARK: Auth
     case refresh(_ refresh: String)
     
     init?(rawValue: String) { nil }
@@ -24,6 +27,8 @@ enum API: RawRepresentable {
             return "user/call"
         case .userVerify:
             return "user/verify"
+        case .userMe:
+            return "user/me"
         case .refresh:
             return "user/refresh"
         }
@@ -61,6 +66,12 @@ enum API: RawRepresentable {
         default:
             return [:]
         }
+    }
+    
+    var bodyData: Data? {
+        let data = try? JSONSerialization.data(withJSONObject: body)
+
+        return data
     }
     
     var url: URL? {
