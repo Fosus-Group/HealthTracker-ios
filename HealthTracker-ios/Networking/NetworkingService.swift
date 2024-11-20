@@ -65,7 +65,7 @@ final class NetworkingService: NetworkingServiceProtocol {
         let (data, response) = try await URLSession.shared.data(for: request)
         
 #if DEBUG
-        logger.log(request: request, response: response, data: data)
+        logger.log(apiRequest: apiRequest, request: request, response: response, data: data)
 #endif
         
         // check for refresh
@@ -174,28 +174,5 @@ extension API {
                 usesAccessToken: usesAccessToken
             )
         }
-    }
-}
-
-
-struct Logger {
-    func log(request: URLRequest, response: URLResponse, data: Data) {
-        guard let httpResponse = response as? HTTPURLResponse else { return }
-        let statusCode = httpResponse.statusCode
-        let authorizationHeader = request.value(forHTTPHeaderField: "Authorization")
-        
-        let jsonString = String(data: data, encoding: .utf8) ?? "No data"
-        let httpMethod = request.httpMethod ?? "No method"
-        let url = request.url?.absoluteString ?? "No url"
-        
-        let output: String = {
-            if let authorizationHeader {
-                return "\(httpMethod) \(url) \(statusCode) \(authorizationHeader) \(jsonString)"
-            } else {
-                return "\(httpMethod) \(url) \(statusCode) \(jsonString)"
-            }
-        }()
-        
-        print(output)
     }
 }
