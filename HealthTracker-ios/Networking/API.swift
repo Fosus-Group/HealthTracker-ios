@@ -87,7 +87,7 @@ enum API: RawRepresentable {
     var muliPart: MultipartFormData? {
         switch self {
         case .userUpload(let imageData):
-            let formData = FormData(key: "file", fileData: imageData, mimeType: "image/jpeg")
+            let formData = FormData(key: "file", fileData: imageData, filename: "image.jpg", mimeType: "image/jpeg")
             let multipart = MultipartFormData(fields: [formData])
             return multipart
         default:

@@ -20,7 +20,7 @@ struct FormData {
         self.filename = nil
     }
     
-    init(key: String, fileData: Data, mimeType: String, filename: String? = nil) {
+    init(key: String, fileData: Data, filename: String, mimeType: String) {
         self.key = key
         self.value = fileData
         self.mimeType = mimeType
@@ -46,7 +46,7 @@ struct MultipartFormData {
     }
     
     mutating func addFile(key: String, fileData: Data, mimeType: String, filename: String) {
-        fields.append(FormData(key: key, fileData: fileData, mimeType: mimeType, filename: filename))
+        fields.append(FormData(key: key, fileData: fileData, filename: filename, mimeType: mimeType))
     }
     
     func build() -> (body: Data, contentType: String) {
@@ -74,5 +74,19 @@ struct MultipartFormData {
         body.append("--\(boundary)--\r\n".data(using: .utf8)!)
         
         return (body, "multipart/form-data; boundary=\(boundary)")
+    }
+}
+
+extension MultipartFormData: CustomDebugStringConvertible {
+    var debugDescription: String {
+        let stringArray = fields.map { field in
+            if let mimetype = field.mimeType, let fileName = field.filename {
+                return "\(field.key): \(field.value.debugDescription) \(fileName) \(mimetype)"
+            } else {
+                return "\(field.key): \(field.value.description)"
+            }
+        }
+        
+        return stringArray.joined(separator: "\r\n")
     }
 }
