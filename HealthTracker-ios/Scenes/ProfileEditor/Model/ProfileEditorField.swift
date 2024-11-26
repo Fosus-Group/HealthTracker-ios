@@ -44,8 +44,10 @@ enum ProfileEditorField: Int, CaseIterable {
         switch self {
         case .username, .firstName:
             return .asciiCapable
-        case .weight, .height:
+        case .weight:
             return .decimalPad
+        case .height:
+            return .numberPad
         }
     }
     

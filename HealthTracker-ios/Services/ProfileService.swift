@@ -11,7 +11,7 @@ protocol ProfileServiceProtocol {
     func loadProfile() async throws -> ProfileModel
     func loadImage(hex: String) async throws -> UIImage
     
-    func updateProfile(_ profile: ProfileModel) async throws -> ProfileModel
+    func updateProfile(_ profile: ProfileModel.DTO) async throws -> ProfileModel
     func updateImage(_ imageData: Data) async throws -> Bool
 }
 
@@ -55,8 +55,8 @@ struct ProfileService: ProfileServiceProtocol {
         }
     }
     
-    func updateProfile(_ profile: ProfileModel) async throws -> ProfileModel {
-        let api = API.userUpdate(profile.username, profile.height)
+    func updateProfile(_ profile: ProfileModel.DTO) async throws -> ProfileModel {
+        let api = API.userUpdate(profile)
         
         let result = try await networking.makeRequest(api: api, of: ProfileModel.DTO.self)
         

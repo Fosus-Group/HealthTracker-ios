@@ -12,6 +12,8 @@ final class ProfileEditorViewController: UIViewController {
     
     private let profileService: ProfileServiceProtocol
     
+    private let originalProfileModel: ProfileModel
+    
     private(set) var profileModel: ProfileModel
     
     private let avatarView = AvatarView()
@@ -52,6 +54,7 @@ final class ProfileEditorViewController: UIViewController {
     // MARK: - Initializer
     init(profileModel: ProfileModel, service: ProfileServiceProtocol) {
         self.profileService = service
+        self.originalProfileModel = profileModel
         self.profileModel = profileModel
         super.init(nibName: nil, bundle: nil)
         hidesBottomBarWhenPushed = true
@@ -68,13 +71,19 @@ final class ProfileEditorViewController: UIViewController {
         layoutFrames()
     }
     
-    @objc private func saveProfile() {
+    @objc private func saveButtonTapped() {
+        Task {
+            await saveProfile()
+        }
+    }
+    
+    private func saveProfile() async {
         guard let username = usernameTextField.text,
               let firstName = firstNameTextField.text,
               let weightString = weightTextField.text,
               let heightString = heightTextField.text,
               let weight = Double(weightString),
-              let height = Double(heightString)
+              let height = Int(heightString)
         else { return }
               
         let profileModel = ProfileModel(
@@ -86,18 +95,31 @@ final class ProfileEditorViewController: UIViewController {
             profilePicture: avatarView.image
         )
         
-        Task {
-            try await profileService.updateProfile(profileModel)
+        let dto: ProfileModel.DTO
+        
+        if originalProfileModel.username != username {
+            dto = profileModel.toDTO()
+        } else {
+            dto = .init(
+                phoneNumber: profileModel.phoneNumber,
+                username: nil,
+                avatarHex: nil,
+                height: profileModel.height
+            )
         }
         
-        if let data = profileModel.saveToDisk() {
-            Task {
-                try await profileService.updateImage(data)
+        do {
+            _ = try await profileService.updateProfile(dto)
+            if let data = profileModel.saveToDisk() {
+                _ = try await profileService.updateImage(data)
             }
+            
+            onSave?(profileModel)
+            navigationController?.popViewController(animated: true)
+        } catch {
+            self.showAlert(error: error)
+            return
         }
-        
-        onSave?(profileModel)
-        navigationController?.popViewController(animated: true)
     }
     
     @objc private func dismissKeyboard() {
@@ -123,6 +145,10 @@ final class ProfileEditorViewController: UIViewController {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
+    deinit {
+        debugPrint("Deinit ProfileEditorViewController")
+    }
 }
 
 // MARK: UITextFieldDelegate
@@ -139,8 +165,10 @@ extension ProfileEditorViewController: UITextFieldDelegate {
         guard let text = textField.text else { return  }
         
         switch editorTextField.fieldType {
-        case .weight, .height:
+        case .weight:
             textField.text = text.replacingOccurrences(of: ",", with: ".")
+            guard let doubleValue = Double(text) else { return }
+            textField.text = String(format: "%.02f", doubleValue)
         default:
             break
         }
@@ -167,13 +195,19 @@ extension ProfileEditorViewController: UITextFieldDelegate {
             }) {
                 return false
             }
-        case .weight, .height:
+        case .weight:
             newString = newString.replacingOccurrences(of: ",", with: ".")
-            if Double(newString) == nil {
+            guard let weight = Double(newString) else {
                 return newString.isEmpty
-            } else {
-                return true
             }
+            
+            return weight <= 635
+        case .height:
+            guard let height = Int(newString) else {
+                return newString.isEmpty
+            }
+            
+            return height <= 251
         }
         
         return true
@@ -232,7 +266,7 @@ extension ProfileEditorViewController {
     
     private func setupSaveButton() {
         saveButton.isEnabled = canSave
-        saveButton.addTarget(self, action: #selector(saveProfile), for: .touchUpInside)
+        saveButton.addTarget(self, action: #selector(saveButtonTapped), for: .touchUpInside)
     }
     
     private func setupGestures() {

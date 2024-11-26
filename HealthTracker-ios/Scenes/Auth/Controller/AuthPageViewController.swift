@@ -14,14 +14,13 @@ final class AuthPageViewController: UIPageViewController {
     var onPageChange: (Int) -> Void = {_ in }
     
     let pages: [AuthPageController] = [
-//        AuthFirstPageController(mainButton: MainButton(title: CSt.buttonStart)),
-//        AuthPhoneFieldController(mainButton: MainButton(title: CSt.buttonLogin)),
+        AuthFirstPageController(mainButton: MainButton(title: CSt.buttonStart)),
+        AuthPhoneFieldController(mainButton: MainButton(title: CSt.buttonLogin)),
         AuthCodeVerifyController(mainButton: MainButton(title: CSt.requestNewCodeText))
     ]
     
     var currentIndex: Int {
-        guard !pages.isEmpty else { return 0 }
-        return pages.firstIndex(of: pageControllers[0])!
+        return pages.firstIndex(of: pageControllers[0]) ?? 0
     }
     
     var pageControllers: [AuthPageController] {

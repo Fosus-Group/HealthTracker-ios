@@ -12,7 +12,7 @@ struct ProfileModel {
     let username: String
     let firstName: String
     let weight: Double
-    let height: Double
+    let height: Int
     let profilePicture: UIImage?
 }
 
@@ -32,7 +32,7 @@ extension ProfileModel {
         let firstName = UserDefaults.standard.string(forKey: "firstName") ?? CSt.defaultFirstName
         
         let weight = UserDefaults.standard.double(forKey: "weight")
-        let height = UserDefaults.standard.double(forKey: "height")
+        let height = UserDefaults.standard.integer(forKey: "height")
         
         let image: UIImage? = .getProfilePicture(withName: "profilePicture")
         
@@ -60,11 +60,28 @@ extension ProfileModel {
     }
 }
 
-struct ProfileModelDTO: Decodable {
+struct ProfileModelDTO {
     let phoneNumber: String?
     let username: String?
     let avatarHex: String?
-    let height: Double?
+    let height: Int?
+}
+
+extension ProfileModelDTO: Decodable {
+    enum CodingKeys: CodingKey {
+        case phoneNumber
+        case username
+        case avatarHex
+        case height
+    }
+    
+    init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.phoneNumber = try container.decode(Optional<String>.self, forKey: .phoneNumber)
+        self.username = try container.decode(Optional<String>.self, forKey: .username)
+        self.avatarHex = try container.decode(Optional<String>.self, forKey: .avatarHex)
+        self.height = try container.decode(Optional<Int>.self, forKey: .height)
+    }
 }
 
 extension ProfileModel: DTOConvertible {
@@ -74,10 +91,19 @@ extension ProfileModel: DTOConvertible {
         Self(
             phoneNumber: dto.phoneNumber ?? "",
             username: dto.username ?? "",
-            firstName: CSt.defaultFirstName,
+            firstName: "",
             weight: 0,
             height: dto.height ?? 0,
             profilePicture: nil
+        )
+    }
+    
+    func toDTO() -> DTO {
+        DTO(
+            phoneNumber: phoneNumber,
+            username: username,
+            avatarHex: nil,
+            height: height
         )
     }
 }

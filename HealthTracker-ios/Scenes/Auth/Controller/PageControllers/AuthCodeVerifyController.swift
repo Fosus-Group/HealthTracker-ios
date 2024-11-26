@@ -181,15 +181,21 @@ private extension AuthCodeVerifyController {
 
 extension UIViewController {
     func showAlert(error: Error) {
-        let title: String
-        let message: String
         if let serverError = error as? ServerError {
-            title = serverError.title
-            message = serverError.text
-        } else {
-            title = "Error"
-            message = error.localizedDescription
+            showAlert(serverError: serverError)
+            return
         }
+        let title: String = "Error"
+        let message: String = error.localizedDescription
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        let action = UIAlertAction(title: "OK", style: .default, handler: nil)
+        alert.addAction(action)
+        self.present(alert, animated: true, completion: nil)
+    }
+    
+    func showAlert(serverError: ServerError) {
+        let title: String = serverError.title
+        let message: String = serverError.text
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
         let action = UIAlertAction(title: "OK", style: .default, handler: nil)
         alert.addAction(action)

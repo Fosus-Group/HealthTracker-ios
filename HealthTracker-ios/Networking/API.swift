@@ -15,7 +15,7 @@ enum API: RawRepresentable {
     case userCall(_ phone: String)
     case userVerify(_ phone: String, _ code: String)
     case userMe
-    case userUpdate(_ username: String, _ height: Double)
+    case userUpdate(_ profileDTO: ProfileModel.DTO)
     case userUpload(_ imageData: Data)
     
     // MARK: Auth
@@ -71,8 +71,17 @@ enum API: RawRepresentable {
             return ["phone_number": phone]
         case .userVerify(let phone, let code):
             return ["phone_number": phone, "code": code]
-        case .userUpdate(let username, let height):
-            return ["username": username, "height": height]
+        case .userUpdate(let model):
+            var body: [String:Any] = [:]
+            
+            if let username = model.username {
+                body["username"] = username
+            }
+            if let height = model.height {
+                body["height"] = height as Int?
+            }
+            
+            return body
         default:
             return [:]
         }
